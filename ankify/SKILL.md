@@ -144,4 +144,3 @@ O(1).
 2.  **Formulate**: Draft questions that are short, clear, and unambiguous.
 3.  **Format**: Apply either the Standard or Context-Extended format strictly based on complexity.
 4.  **Validate**: Ensure the answer is concise and directly addresses the question.
-
