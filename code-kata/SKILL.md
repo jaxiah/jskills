@@ -1,6 +1,6 @@
 ---
 name: code-kata
-description: Anki-driven code kata workflow for building procedural programming skills through spaced repetition. Use when the user invokes /kata new, /kata start, or /kata done to manage coding practice sessions.
+description: Anki-driven code kata workflow for building procedural programming skills through spaced repetition. Use when the user invokes /code-kata new, /code-kata start, or /code-kata done to manage coding practice sessions.
 ---
 
 # Code-Kata Skill
@@ -22,7 +22,7 @@ code_katas/
 
 ## Commands
 
-### `/kata new`
+### `/code-kata new`
 
 **Purpose:** Design a new kata from scratch — both the Anki card content and the compilable scaffold.
 
@@ -85,7 +85,7 @@ Performance Target (optional):
 
 ---
 
-### `/kata start <name>`
+### `/code-kata start <name>`
 
 **Purpose:** Begin a new practice session for an existing kata.
 
@@ -102,7 +102,7 @@ Performance Target (optional):
 
 ---
 
-### `/kata done <name> [again|hard|good|easy]`
+### `/code-kata done <name> [again|hard|good|easy]`
 
 **Purpose:** Close a session, verify the code, debrief, and evaluate for knowledge gaps.
 
