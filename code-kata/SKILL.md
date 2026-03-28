@@ -32,9 +32,13 @@ code_katas/
    - What topic / direction are you currently studying?
    - Micro-Kata (~5 min, one tricky logic block) or Full-Kata (~15–20 min, complete implementation)?
 
-2. Generate `code_katas/<kata-name>/kata.md` in **ankify Context-Extended format**:
+2. Generate `code_katas/<kata-name>/kata.md` in **ankify Context-Extended format**, with a fixed frontmatter block at the top:
 
 ```markdown
+---
+ankideck: codekata
+---
+
 #### [Micro-Kata | Full-Kata]: [concise task description]
 
 [Setup constraints: what file to edit, what function signature is provided, time limit, etc.]
@@ -72,7 +76,7 @@ Performance Target (optional):
      - Checks output against the expected result specified in `kata.md`
      - Exits non-zero on failure
 
-4. Create `code_katas/<kata-name>/sessions.md` with empty sections:
+4. Create `code_katas/<kata-name>/sessions.md` with empty sections. **Do not add frontmatter yet** — it will be added the first time a knowledge note is written:
 
 ```markdown
 ## Sessions
@@ -133,6 +137,12 @@ Performance Target (optional):
    - Read the `## Knowledge Notes` section of `sessions.md`.
    - Check for semantic duplicates (same underlying concept, even if worded differently). If a duplicate exists, say so and skip.
    - Otherwise, generate one or more atomic notes in **ankify format** and append them under `## Knowledge Notes` in `sessions.md`.
+   - **Frontmatter:** If `sessions.md` does not yet have a frontmatter block (i.e., the file does not start with `---`), prepend one before writing the note. Infer the appropriate deck from the note's subject matter (e.g., CUDA content → `md2anki::cuda`):
+     ```markdown
+     ---
+     ankideck: md2anki::<topic>
+     ---
+     ```
 
 ---
 
