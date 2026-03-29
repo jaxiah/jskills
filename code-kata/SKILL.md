@@ -89,6 +89,29 @@ Performance Target (optional):
 
 ---
 
+### `/code-kata list`
+
+**Purpose:** List all kata in the current workspace so the user can choose what to practice.
+
+**Steps:**
+
+1. Enumerate all subdirectories of `code_katas/` that contain a `kata.md` file.
+2. For each kata, read its `sessions.md` and extract:
+   - Total session count
+   - Last session date and score
+3. Print a table:
+
+```
+Kata             Sessions   Last session   Last score
+──────────────── ────────── ────────────── ──────────
+matmul-naive     1          2026-03-28     again
+matmul-tiled     1          2026-03-28     —
+```
+
+4. If `code_katas/` does not exist or contains no kata, say so.
+
+---
+
 ### `/code-kata start <name>`
 
 **Purpose:** Begin a new practice session for an existing kata.
@@ -98,7 +121,7 @@ Performance Target (optional):
 1. Verify `code_katas/<name>/` exists with `kata.md` and `scaffold/`.
 2. Create `code_katas/<name>/YYYY-MM-DD/` (today's date).
 3. Copy all files from `scaffold/` into the new dated directory.
-4. Append a new row to the Sessions table in `sessions.md` with today's date and start time. Leave End, Duration, Score, Notes blank:
+4. **Get the current time using a Bash tool call** (`date +%H:%M`) before writing anything. Never guess or approximate the time. Append a new row to the Sessions table in `sessions.md` with today's date and the retrieved start time. Leave End, Duration, Score, Notes blank:
    ```
    | 2026-03-23 | 14:32 | — | — | — | — |
    ```
@@ -112,7 +135,7 @@ Performance Target (optional):
 
 **Steps:**
 
-1. **Record end time.** Fill in End, Duration, and Score for today's row in `sessions.md`.
+1. **Record end time.** **Get the current time using a Bash tool call** (`date +%H:%M`) before writing anything. Never guess or approximate the time. Fill in End, Duration, and Score for today's row in `sessions.md`.
 
 2. **Compile and run.**
    - `cd` into `code_katas/<name>/YYYY-MM-DD/` and build with the scaffold's build system.
@@ -134,6 +157,7 @@ Performance Target (optional):
    _"Want me to add a knowledge-type Anki note for this gap?"_
 
    If yes:
+   - **Invoke the `ankify` skill** using the Skill tool before writing any notes. This loads the exact format rules; do not rely on memory.
    - Read the `## Knowledge Notes` section of `sessions.md`.
    - Check for semantic duplicates (same underlying concept, even if worded differently). If a duplicate exists, say so and skip.
    - Otherwise, generate one or more atomic notes in **ankify format** and append them under `## Knowledge Notes` in `sessions.md`.
