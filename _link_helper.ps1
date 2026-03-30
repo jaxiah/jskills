@@ -2,7 +2,7 @@ param([string]$jskills = $PSScriptRoot)
 
 $target = Join-Path $env:USERPROFILE '.claude\skills'
 
-Get-ChildItem $jskills -Directory | ForEach-Object {
+Get-ChildItem $jskills -Directory | Where-Object { $_.Name -notlike '.*' } | ForEach-Object {
     $link = Join-Path $target $_.Name
     if (Test-Path $link) {
         Write-Host "SKIP  $($_.Name)  (already exists)"
