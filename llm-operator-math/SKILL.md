@@ -25,6 +25,20 @@ This skill works best when preceded by:
 
 If the user already has a PRD and issues in `BACKLOG/`, skip straight to Phase 2 below. If not, suggest using those skills first or do a lightweight version inline.
 
+## Single-Issue Discipline (CRITICAL)
+
+**Each invocation of this skill processes exactly ONE issue (= one operator or one operator group).**
+
+This is a hard constraint for context management, consistent with how `write-a-prd` and `prd-to-issues` work:
+
+- `write-a-prd` produces one PRD (bounded scope)
+- `prd-to-issues` processes one issue at a time (bounded context)
+- This skill processes one issue at a time: write its README, impl.py, and concept plot
+
+**Never batch multiple operators into a single invocation.** If the user asks to "do all operators", do the first one, commit, then tell the user to invoke again for the next.
+
+Before starting work, identify which ISSUE you are working on. Read it from `BACKLOG/` and confirm with the user if ambiguous.
+
 ---
 
 ## Phase 1: Project Scaffolding
@@ -197,9 +211,32 @@ if __name__ == "__main__":
 
 ---
 
-## Phase 3: Math README Authoring (THE CORE DELIVERABLE)
+## Phase 3: Math README Authoring + Concept Plot (THE CORE DELIVERABLE)
 
 The README is the **primary artifact** — it should be a standalone, publishable blog post that fully explains the operator's mathematics to someone with basic linear algebra knowledge.
+
+### Concept Plot Workflow (Integrated into README Writing)
+
+While writing the README, **plan visualizations as part of the writing process** — not as an afterthought. When you reach a point where a diagram would explain the concept better than text:
+
+1. **Decide inline**: "this concept needs a figure" (e.g., a function curve comparison, a tensor shape diagram, an attention heatmap)
+2. **Write the markdown image reference immediately**: `![Descriptive Alt Text](./filename.png)` — this acts as a natural placeholder that is also the final syntax
+3. **Continue writing the README** to completion
+
+After the README is done:
+
+4. **Write the plotting function** in `e2e/generate_concept_plots.py` — append a `plot_NN_operator()` function that generates the PNG with the exact filename referenced in the README
+5. **Run the function** to generate the PNG
+6. **Read the PNG** to verify it renders correctly (no text overflow, legible labels, correct content)
+7. If there are rendering issues, fix and regenerate
+
+**Plot design principles:**
+
+- Use **synthetic data only** — concept plots must not depend on model weights or activation dumps
+- Focus on **conceptual understanding**, not validation results (no error distributions or before/after histograms of real model data)
+- Good concept plots: function curves with derivatives, small worked-example heatmaps, tensor shape transformation diagrams, architecture data-flow diagrams, gating mechanism visualizations
+- Use `e2e/plot_utils.py` for shared matplotlib setup (style, save, etc.)
+- One plot per operator is usually enough — don't force a plot where text suffices
 
 ### Target Audience
 
@@ -300,6 +337,7 @@ Every operator README MUST include all of the following sections. Sections may b
 5. **No "obviously" or "trivially"**: If it were obvious, the reader wouldn't need the document.
 
 6. **Section length targets**:
+
    - Total README: 400–1000+ lines of Markdown
    - Core operators (attention, RoPE, conv3d): 800–1200 lines
    - Simple operators (activation functions, norms): 400–700 lines
@@ -336,40 +374,40 @@ The E2E runner is the final deliverable that proves all implementations are corr
 ## Workflow Summary
 
 ```
-[write-a-prd]  →  PRD in BACKLOG/
+[write-a-prd]          →  PRD in BACKLOG/
        ↓
-[prd-to-issues]  →  One ISSUE per operator (or operator group)
+[prd-to-issues]        →  One ISSUE per operator (or operator group)
        ↓
-[This skill - Phase 1]  →  Scaffold: e2e/, operators/00_overview/, dump script
-       ↓
-Run dump_activations.py  →  activations/*.npy ground truth
-       ↓
-[This skill - Phase 2]  →  For each operator: impl.py with validation
-       ↓
-[This skill - Phase 3]  →  For each operator: README.md math explainer
-       ↓
-[This skill - Phase 4]  →  E2E runner: all operators pass
-       ↓
-Git commit with all artifacts
+[This skill - Phase 1] →  Scaffold: e2e/, operators/00_overview/, dump script
+       ↓                   (once per project)
+Run dump_activations.py →  activations/*.npy ground truth
+       ↓                   (once per project)
+[This skill]           →  Pick ONE issue → Phase 2 (impl.py) + Phase 3 (README + plot)
+       ↓                   (repeat for each issue, one at a time)
+[This skill - Phase 4] →  E2E runner: all operators pass
+                           (once, after all issues are done)
 ```
 
-### Parallelization Strategy
+### Single-Issue Execution Flow (Per Invocation)
 
-- Phase 2 operators can be implemented in **dependency order** (some operators depend on others, e.g., attention depends on linear, softmax, RoPE)
-- Phase 3 READMEs can be written in **parallel batches** using background agents — group by complexity:
-  - Batch 1: Simple element-wise ops (activation functions, norms)
-  - Batch 2: Medium complexity (linear, embedding, residual)
-  - Batch 3: Complex (attention, RoPE, conv3d, patch merger)
-  - Batch 4: Composite (full blocks, decoder layers, lm_head)
+Each invocation of this skill for a specific operator follows this sequence:
+
+1. Read the ISSUE from `BACKLOG/`
+2. Write `impl.py` (Phase 2) — core operator + validation
+3. Write `README.md` (Phase 3) — with `![](./name.png)` inline where needed
+4. Append plot function to `e2e/generate_concept_plots.py` and run it
+5. Read the generated PNG to verify rendering quality
+6. Commit all artifacts for this operator
 
 ### Quality Checklist
 
-Before committing, verify:
+Before committing each operator, verify:
 
-- [ ] All `impl.py` files run individually (`python -m operators.NN_name.impl`)
-- [ ] E2E runner passes all validations
-- [ ] Every README has all 10 required sections
+- [ ] `impl.py` runs individually (`python -m operators.NN_name.impl`)
+- [ ] README has all 10 required sections
 - [ ] MathJax renders correctly (no broken `$...$` pairs)
 - [ ] Dimension annotations are consistent across README and impl.py
 - [ ] Model-specific numbers (hidden_size, num_heads, etc.) are accurate
 - [ ] Variable names in code match notation in README
+- [ ] Concept plot PNG exists and renders correctly (no text overflow, legible labels)
+- [ ] README image reference `![...](./name.png)` matches the actual PNG filename

@@ -29,6 +29,7 @@ code_katas/
 **Steps:**
 
 1. Ask the user:
+
    - What topic / direction are you currently studying?
    - Micro-Kata (~5 min, one tricky logic block) or Full-Kata (~15–20 min, complete implementation)?
 
@@ -58,6 +59,7 @@ Performance Target (optional):
 ```
 
 3. Generate `code_katas/<kata-name>/scaffold/` — a **fully compilable project** with one hole:
+
    - **Micro-Kata:** All files are complete and correct. In exactly one file, replace the target logic with a clearly bounded TODO block:
 
      ```
@@ -138,16 +140,19 @@ matmul-tiled     1          2026-03-28     —
 1. **Record end time.** **Get the current time using a Bash tool call** (`date +%H:%M`) before writing anything. Never guess or approximate the time. Fill in End, Duration, and Score for today's row in `sessions.md`.
 
 2. **Compile and run.**
+
    - `cd` into `code_katas/<name>/YYYY-MM-DD/` and build with the scaffold's build system.
    - Run the binary.
    - Report: compiled? (how many attempts?), ran without crash?, output matched expected?
 
 3. **Debrief.** Read the user's code (the file they edited). Give specific, targeted feedback:
+
    - What did they get right?
    - Where did friction likely occur (e.g., boundary conditions, index arithmetic)?
    - Any correctness issues beyond what the test caught?
 
 4. **Evaluate for knowledge gaps.** Read the full Sessions table to check for patterns:
+
    - Two or more consecutive `again` scores → strong signal of a declarative knowledge gap.
    - A single `again` or repeated `hard` with similar friction notes → weaker signal, worth flagging.
 
@@ -157,6 +162,7 @@ matmul-tiled     1          2026-03-28     —
    _"Want me to add a knowledge-type Anki note for this gap?"_
 
    If yes:
+
    - **Invoke the `ankify` skill** using the Skill tool before writing any notes. This loads the exact format rules; do not rely on memory.
    - Read the `## Knowledge Notes` section of `sessions.md`.
    - Check for semantic duplicates (same underlying concept, even if worded differently). If a duplicate exists, say so and skip.
