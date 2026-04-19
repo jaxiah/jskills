@@ -46,8 +46,8 @@ Iterate until the user approves.
 
 ### 5. Save the design
 
-**Filename convention**: `DESIGN-NNN-short-slug.md` where NNN is the next global sequence number.
-To find NNN: glob `BACKLOG/*.md`, extract the highest 3-digit prefix across all files (PRD/ISSUE/DESIGN share the same global sequence), increment by 1.
+**Filename convention**: `DESIGN-of-<ISSUE-filename>` — derive directly from the parent ISSUE's filename.
+Example: `ISSUE-004-matmul-tiling.md` → `DESIGN-of-ISSUE-004-matmul-tiling.md`. No global counter needed.
 
 <design-template>
 

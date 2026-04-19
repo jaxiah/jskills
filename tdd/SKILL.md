@@ -46,7 +46,8 @@ RIGHT (vertical):
 
 Before writing any code:
 
-- [ ] If a `DESIGN-NNN` file exists for this issue, read it — it contains the confirmed interfaces and testing priorities
+- [ ] Ask the user for the ISSUE filename if not already known (e.g. `ISSUE-004-my-slice.md`)
+- [ ] Look for `DESIGN-of-<ISSUE-filename>` in `BACKLOG/` — if it exists, read it for confirmed interfaces and testing priorities
 - [ ] Confirm with user what interface changes are needed (or verify against the DESIGN file)
 - [ ] Confirm with user which behaviors to test, in priority order (the DESIGN file's Testing Priorities is the starting point)
 - [ ] List the behaviors to test (not implementation steps)
@@ -94,6 +95,22 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 - [ ] Run tests after each refactor step
 
 **Never refactor while RED.** Get to GREEN first.
+
+### 5. Close the ISSUE
+
+After all tests pass and refactor is complete:
+
+- [ ] Read the parent ISSUE file from `BACKLOG/`
+- [ ] Go through each acceptance criterion — check off `- [x]` any that are now satisfied by the implementation
+- [ ] Append a completion record at the bottom of the ISSUE file:
+
+```markdown
+## Completed
+
+YYYY-MM-DD — all acceptance criteria met. Implemented via TDD.
+```
+
+If some criteria are intentionally deferred (out of scope for this session), note them explicitly rather than leaving them unchecked without explanation.
 
 ## Checklist Per Cycle
 
