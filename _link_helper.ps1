@@ -1,13 +1,21 @@
 param([string]$jskills = $PSScriptRoot)
 
-$target = Join-Path $env:USERPROFILE '.claude\skills'
+$targets = @(
+    Join-Path $env:USERPROFILE '.claude\skills'
+    Join-Path $env:USERPROFILE '.gemini\skills'
+)
 
-Get-ChildItem $jskills -Directory | Where-Object { $_.Name -notlike '.*' } | ForEach-Object {
-    $link = Join-Path $target $_.Name
-    if (Test-Path $link) {
-        Write-Host "SKIP  $($_.Name)  (already exists)"
-    } else {
-        New-Item -ItemType Junction -Path $link -Target $_.FullName | Out-Null
-        Write-Host "LINK  $($_.Name)"
+$dirs = Get-ChildItem $jskills -Directory | Where-Object { $_.Name -notlike '.*' }
+
+foreach ($target in $targets) {
+    Write-Host "`n-> $target"
+    foreach ($dir in $dirs) {
+        $link = Join-Path $target $dir.Name
+        if (Test-Path $link) {
+            Write-Host "SKIP  $($dir.Name)  (already exists)"
+        } else {
+            New-Item -ItemType Junction -Path $link -Target $dir.FullName | Out-Null
+            Write-Host "LINK  $($dir.Name)"
+        }
     }
 }
