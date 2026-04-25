@@ -72,9 +72,11 @@ A concise description of this vertical slice. Describe the end-to-end behavior, 
 
 ## Acceptance criteria
 
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
+Each criterion must trace back to at least one numbered user story from the parent PRD. Write criteria as observable, verifiable outcomes — not implementation steps.
+
+- [ ] Criterion 1 _(covers user story N)_
+- [ ] Criterion 2 _(covers user story N)_
+- [ ] Criterion 3 _(covers user story N)_
 
 ## Blocked by
 

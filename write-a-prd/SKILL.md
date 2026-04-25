@@ -46,17 +46,18 @@ This list of user stories should be extremely extensive and cover all aspects of
 
 ## Implementation Decisions
 
-A list of implementation decisions that were made. This can include:
+A list of implementation decisions that were made. Stay at the module level — interface-level detail (function signatures, type definitions) belongs in the DESIGN file, not here.
 
-- The modules that will be built/modified
-- The interfaces of those modules that will be modified
-- Technical clarifications from the developer
+This can include:
+
+- Which modules will be built or modified, and what each one is responsible for
+- How modules interact with each other (data flow, call direction)
 - Architectural decisions
-- Schema changes
-- API contracts
-- Specific interactions
+- Schema changes (entity level, not field-by-field)
+- External API endpoints introduced (e.g. new REST routes — not their request/response schemas)
+- Technical clarifications from the developer
 
-Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
+Do NOT include: function signatures, type definitions, internal API contracts, or specific file paths. They are volatile and will be outdated quickly. That detail belongs in the DESIGN file.
 
 ## Testing Decisions
 

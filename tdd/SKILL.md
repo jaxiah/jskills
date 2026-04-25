@@ -47,15 +47,17 @@ RIGHT (vertical):
 Before writing any code:
 
 - [ ] Ask the user for the ISSUE filename if not already known (e.g. `ISSUE-004-my-slice.md`)
-- [ ] Look for `DESIGN-of-<ISSUE-filename>` in `BACKLOG/` — if it exists, read it for confirmed interfaces and testing priorities
-- [ ] Confirm with user what interface changes are needed (or verify against the DESIGN file)
-- [ ] Confirm with user which behaviors to test, in priority order (the DESIGN file's Testing Priorities is the starting point)
-- [ ] List the behaviors to test (not implementation steps)
+- [ ] Check `BACKLOG/` for any existing `AMENDMENT-of-<ISSUE-filename>.md` marked BLOCKED. If one exists, do not proceed — resolve the amendment with the user first.
+- [ ] Look for `DESIGN-of-<ISSUE-filename>` in `BACKLOG/`. If it does **not** exist, stop and run the `design` skill first — TDD requires confirmed interfaces before proceeding.
+- [ ] Read the DESIGN file for confirmed interfaces and testing priorities.
+- [ ] Treat the interfaces in the DESIGN file as fixed. Do not redesign them here. If implementation will require interface changes, that is an Amendment candidate — flag it, do not silently change.
+- [ ] **Map every acceptance criterion to a test.** Read each criterion in the ISSUE and write down which test will verify it. If a criterion cannot be covered by an automated test, mark it explicitly as `[manual]` — it will require direct execution before the issue can be closed.
+- [ ] List the behaviors to test (not implementation steps), derived from the criteria mapping above
 - [ ] Get user approval on the plan
 
-Ask: "What should the public interface look like? Which behaviors are most important to test?"
+**You can't test everything** — this applies to edge cases and implementation details, not to acceptance criteria. Every acceptance criterion must be covered by either an automated test or a `[manual]` marker. No criterion may be silently skipped.
 
-**You can't test everything.** Confirm with the user exactly which behaviors matter most. Focus testing effort on critical paths and complex logic, not every possible edge case.
+**A placeholder test that doesn't verify any acceptance criterion is not a test — it is a liability.** It passes when things are broken and gives false confidence. Every test must trace back to at least one acceptance criterion.
 
 ### 2. Tracer Bullet
 
@@ -102,6 +104,7 @@ After all tests pass and refactor is complete:
 
 - [ ] Read the parent ISSUE file from `BACKLOG/`
 - [ ] Go through each acceptance criterion — check off `- [x]` any that are now satisfied by the implementation
+- [ ] For `[manual]` criteria, execute them directly now. Do not infer pass/fail.
 - [ ] Append a completion record at the bottom of the ISSUE file:
 
 ```markdown
@@ -111,6 +114,45 @@ YYYY-MM-DD — all acceptance criteria met. Implemented via TDD.
 ```
 
 If some criteria are intentionally deferred (out of scope for this session), note them explicitly rather than leaving them unchecked without explanation.
+
+### Interrupt: When implementation reveals a problem
+
+This can fire at any point during steps 2, 3, or 4 — not only at the end.
+
+During TDD you may discover that an acceptance criterion is impossible, ambiguous, or that the DESIGN file has an error. This is normal — implementation surfaces information that design cannot anticipate.
+
+**Do not modify the ISSUE or DESIGN file directly.** Instead:
+
+1. Create `BACKLOG/AMENDMENT-of-ISSUE-NNN-slug.md` with the following structure:
+
+```markdown
+## Parent Issue
+[ISSUE-NNN-slug.md](ISSUE-NNN-slug.md)
+
+## Problem discovered
+Which acceptance criterion or design decision is blocked, and at what point in implementation it was found.
+
+## Type
+- [ ] IMPOSSIBLE — cannot be done given current constraints (explain the constraint)
+- [ ] AMBIGUOUS — criterion has multiple valid interpretations (show the ambiguity)
+- [ ] DESIGN-ERROR — the interface specified in the DESIGN file does not work in practice (show the failed attempt)
+
+## Evidence
+For DESIGN-ERROR: include the implementation path that was tried and why it failed.
+For IMPOSSIBLE: state the constraint explicitly (e.g. depends on ISSUE-NNN not yet done).
+For AMBIGUOUS: show both interpretations and why neither is clearly correct.
+
+## Proposed change
+What specifically should be updated in the ISSUE or DESIGN file.
+
+## TDD status
+BLOCKED — awaiting human review.
+```
+
+2. Stop the TDD session. Do not work around the problem or silently lower the bar.
+3. Wait for the human to review, approve, reject, or modify the amendment before continuing.
+
+**The amendment requirement exists to prevent gaming.** Modifying acceptance criteria to match what was implemented — rather than implementing what was specified — produces software that satisfies paperwork, not users. The amendment process makes every backward change visible and human-approved.
 
 ## Checklist Per Cycle
 
