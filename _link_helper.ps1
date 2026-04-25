@@ -8,6 +8,7 @@ $targets = @(
 $dirs = Get-ChildItem $jskills -Directory | Where-Object { $_.Name -notlike '.*' }
 
 foreach ($target in $targets) {
+    New-Item -ItemType Directory -Force -Path $target | Out-Null
     Write-Host "`n-> $target"
     foreach ($dir in $dirs) {
         $link = Join-Path $target $dir.Name
