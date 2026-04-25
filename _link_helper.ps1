@@ -3,6 +3,7 @@ param([string]$jskills = $PSScriptRoot)
 $targets = @(
     Join-Path $env:USERPROFILE '.claude\skills'
     Join-Path $env:USERPROFILE '.gemini\skills'
+    Join-Path $env:USERPROFILE '.codex\skills'
 )
 
 $dirs = Get-ChildItem $jskills -Directory | Where-Object { $_.Name -notlike '.*' }
