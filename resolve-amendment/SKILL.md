@@ -21,6 +21,7 @@ Read the parent ISSUE file. If the amendment is a DESIGN-ERROR, also read the DE
 ### 3. Present a clear summary
 
 Show the user:
+
 - Which criterion or design decision is blocked
 - The amendment type (IMPOSSIBLE / AMBIGUOUS / DESIGN-ERROR)
 - The evidence provided

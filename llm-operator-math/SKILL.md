@@ -337,7 +337,6 @@ Every operator README MUST include all of the following sections. Sections may b
 5. **No "obviously" or "trivially"**: If it were obvious, the reader wouldn't need the document.
 
 6. **Section length targets**:
-
    - Total README: 400–1000+ lines of Markdown
    - Core operators (attention, RoPE, conv3d): 800–1200 lines
    - Simple operators (activation functions, norms): 400–700 lines

@@ -127,25 +127,31 @@ During TDD you may discover that an acceptance criterion is impossible, ambiguou
 
 ```markdown
 ## Parent Issue
+
 [ISSUE-NNN-slug.md](ISSUE-NNN-slug.md)
 
 ## Problem discovered
+
 Which acceptance criterion or design decision is blocked, and at what point in implementation it was found.
 
 ## Type
+
 - [ ] IMPOSSIBLE — cannot be done given current constraints (explain the constraint)
 - [ ] AMBIGUOUS — criterion has multiple valid interpretations (show the ambiguity)
 - [ ] DESIGN-ERROR — the interface specified in the DESIGN file does not work in practice (show the failed attempt)
 
 ## Evidence
+
 For DESIGN-ERROR: include the implementation path that was tried and why it failed.
 For IMPOSSIBLE: state the constraint explicitly (e.g. depends on ISSUE-NNN not yet done).
 For AMBIGUOUS: show both interpretations and why neither is clearly correct.
 
 ## Proposed change
+
 What specifically should be updated in the ISSUE or DESIGN file.
 
 ## TDD status
+
 BLOCKED — awaiting human review.
 ```
 
