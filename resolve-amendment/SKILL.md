@@ -1,17 +1,17 @@
 ---
 name: resolve-amendment
-description: Review and resolve a BLOCKED AMENDMENT file created during design or TDD. Use when the user wants to unblock a stalled design or TDD session, review a proposed change to an ISSUE or DESIGN file, or approve/reject an amendment.
+description: Review and resolve a BLOCKED AMENDMENT file created during design, TDD, or verify. Use when the user wants to unblock a stalled session, review a proposed change to an ISSUE or DESIGN file, or approve/reject an amendment.
 ---
 
 # Resolve Amendment
 
-An AMENDMENT file is created when the `design` or `tdd` skill hits a problem it cannot resolve without human input. This skill guides the human through reviewing the amendment and updating the affected files so work can continue.
+An AMENDMENT file is created when the `design`, `tdd`, or `verify` skill hits a problem it cannot resolve without human input. This skill guides the human through reviewing the amendment and updating the affected files so work can continue.
 
 ## Process
 
 ### 1. Locate the AMENDMENT file
 
-Ask the user for the AMENDMENT filename (e.g. `PRD-002-ISSUE-004-AMENDMENT-matmul-tiling.md`).
+Ask the user for the AMENDMENT filename (e.g. `PRD-002-ISSUE-004-AMENDMENT-matmul-tiling.md` or `INVEST-001-ISSUE-002-AMENDMENT-bandwidth-target.md`).
 Read it from `BACKLOG/` using the Read tool.
 
 ### 2. Read the affected files
@@ -58,8 +58,8 @@ YYYY-MM-DD — [Approved | Modified]: <one-sentence description of what changed 
 YYYY-MM-DD — Rejected: <one-sentence explanation of why this is not a blocker>
 ```
 
-- The blocked session (design or TDD) may need guidance on how to proceed given the original spec.
+- The blocked session may need guidance on how to proceed given the original spec.
 
 ### 6. Signal the unblock
 
-Tell the user which skill to re-invoke to continue: `design` or `tdd`.
+Tell the user which skill to re-invoke to continue: `design`, `tdd`, or `verify`.

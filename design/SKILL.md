@@ -52,7 +52,7 @@ If exploring the codebase or designing interfaces reveals that an acceptance cri
 
 **Do not modify the ISSUE file directly.** Instead:
 
-1. Create `BACKLOG/PRD-MMM-ISSUE-NNN-AMENDMENT-short-slug.md` using the same format as TDD amendments (see tdd skill).
+1. Create `BACKLOG/<ISSUE-prefix>-AMENDMENT-short-slug.md` using the same format as TDD amendments (see tdd skill).
 2. Stop the design session. Do not work around the problem or silently lower the bar.
 3. Wait for the human to review and resolve the amendment before continuing.
 

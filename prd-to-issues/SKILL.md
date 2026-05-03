@@ -53,6 +53,7 @@ Iterate until the user approves the breakdown.
 ### 5. Create the ISSUE files
 
 **Filename convention**: `PRD-MMM-ISSUE-NNN-short-slug.md`
+
 - MMM = the parent PRD number (e.g. `002` for `PRD-002-...`)
 - NNN = the issue's own sequence number, scoped to this PRD, starting from 001
 - To find the next NNN: glob `BACKLOG/PRD-MMM-ISSUE-*.md` (where MMM is the parent PRD number), extract the highest NNN, increment by 1. If no issues exist yet for this PRD, start at 001.

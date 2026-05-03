@@ -47,8 +47,8 @@ RIGHT (vertical):
 Before writing any code:
 
 - [ ] Ask the user for the ISSUE filename if not already known (e.g. `PRD-002-ISSUE-004-my-slice.md`)
-- [ ] Check `BACKLOG/` for any existing `PRD-MMM-ISSUE-NNN-AMENDMENT-*.md` for this issue marked BLOCKED. If one exists, do not proceed — resolve the amendment with the user first.
-- [ ] Look for `PRD-MMM-ISSUE-NNN-DESIGN-*.md` in `BACKLOG/`. If it does **not** exist, stop and run the `design` skill first — TDD requires confirmed interfaces before proceeding.
+- [ ] Check `BACKLOG/` for any existing `<ISSUE-prefix>-AMENDMENT-*.md` for this issue marked BLOCKED. If one exists, do not proceed — resolve the amendment with the user first.
+- [ ] Look for `<ISSUE-prefix>-DESIGN-*.md` in `BACKLOG/`. If it does **not** exist, stop and run the `design` skill first — TDD requires confirmed interfaces before proceeding.
 - [ ] Read the DESIGN file for confirmed interfaces and testing priorities.
 - [ ] Treat the interfaces in the DESIGN file as fixed. Do not redesign them here. If implementation will require interface changes, that is an Amendment candidate — flag it, do not silently change.
 - [ ] **Map every acceptance criterion to a test.** Read each criterion in the ISSUE and write down which test will verify it. If a criterion cannot be covered by an automated test, mark it explicitly as `[manual]` — it will require direct execution before the issue can be closed.
@@ -123,12 +123,12 @@ During TDD you may discover that an acceptance criterion is impossible, ambiguou
 
 **Do not modify the ISSUE or DESIGN file directly.** Instead:
 
-1. Create `BACKLOG/PRD-MMM-ISSUE-NNN-AMENDMENT-short-slug.md` with the following structure:
+1. Create `BACKLOG/<ISSUE-prefix>-AMENDMENT-short-slug.md` with the following structure:
 
 ```markdown
 ## Parent Issue
 
-[PRD-MMM-ISSUE-NNN-slug.md](PRD-MMM-ISSUE-NNN-slug.md)
+[<ISSUE-filename>](ISSUE-filename)
 
 ## Problem discovered
 
