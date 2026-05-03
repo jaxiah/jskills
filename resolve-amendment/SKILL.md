@@ -12,7 +12,7 @@ An AMENDMENT file is created when the `design`, `tdd`, or `verify` skill hits a 
 ### 1. Locate the AMENDMENT file
 
 Ask the user for the AMENDMENT filename (e.g. `PRD-002-ISSUE-004-AMENDMENT-matmul-tiling.md` or `INVEST-001-ISSUE-002-AMENDMENT-bandwidth-target.md`).
-Read it from `BACKLOG/` using the Read tool.
+Read it from `BACKLOG/`.
 
 ### 2. Read the affected files
 

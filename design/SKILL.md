@@ -12,7 +12,7 @@ Translate an ISSUE into a concrete interface and module design that TDD can cons
 ### 1. Read the ISSUE
 
 Ask the user for the ISSUE filename (e.g. `ISSUE-004-my-slice.md`).
-Read it from `BACKLOG/` using the Read tool. If the ISSUE is already in context, skip the read.
+Read it from `BACKLOG/`. If the ISSUE is already in context, skip the read.
 
 ### 2. Explore the codebase
 

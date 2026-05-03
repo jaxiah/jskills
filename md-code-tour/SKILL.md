@@ -130,7 +130,7 @@ Optional: comparison table, edge-case note, "why not X?" callout.
 
 ## Neovim integration (codetour.lua)
 
-Located at `D:\JBYO\jvim\lua\codetour.lua`.
+Located in your Neovim config (`codetour.lua`).
 
 ```
 :TourLoad                   — auto-detect <stem>.tour from current .md buffer
@@ -158,7 +158,7 @@ Navigation is driven by the standard quickfix machinery. `]q`/`[q` move through 
 
 ## Quality rules
 
-- Every `file:line` (in both `.md` and `.json`) must be **accurate** — verify with the Read tool before writing, never estimate.
+- Every `file:line` (in both `.md` and `.json`) must be **accurate** — verify by reading the file before writing, never estimate.
 - Step descriptions must explain **why**, not just restate what the code does.
 - Keep inline snippets in `.md` **minimal** — only lines needed to understand the point.
 - Sections / steps should answer **questions the reader has**, not mirror file structure.

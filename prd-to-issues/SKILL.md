@@ -14,7 +14,7 @@ All files live in the project's `BACKLOG/` directory.
 
 Ask the user for the PRD filename (e.g. `PRD-003-my-feature.md`).
 
-Read it from `BACKLOG/` using the Read tool. If the PRD is already in context, skip the read.
+Read it from `BACKLOG/`. If the PRD is already in context, skip the read.
 
 ### 2. Explore the codebase (optional)
 

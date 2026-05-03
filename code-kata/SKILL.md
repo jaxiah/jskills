@@ -121,7 +121,7 @@ matmul-tiled     1          2026-03-28     —
 1. Verify `code_katas/<name>/` exists with `kata.md` and `scaffold/`.
 2. Create `code_katas/<name>/YYYY-MM-DD/` (today's date).
 3. Copy all files from `scaffold/` into the new dated directory.
-4. **Get the current time using a Bash tool call** (`date +%H:%M`) before writing anything. Never guess or approximate the time. Append a new row to the Sessions table in `sessions.md` with today's date and the retrieved start time. Leave End, Duration, Score, Notes blank:
+4. **Get the current time by running `date +%H:%M`** before writing anything. Never guess or approximate the time. Append a new row to the Sessions table in `sessions.md` with today's date and the retrieved start time. Leave End, Duration, Score, Notes blank:
    ```
    | 2026-03-23 | 14:32 | — | — | — | — |
    ```
@@ -135,7 +135,7 @@ matmul-tiled     1          2026-03-28     —
 
 **Steps:**
 
-1. **Record end time.** **Get the current time using a Bash tool call** (`date +%H:%M`) before writing anything. Never guess or approximate the time. Fill in End, Duration, and Score for today's row in `sessions.md`.
+1. **Record end time.** **Get the current time by running `date +%H:%M`** before writing anything. Never guess or approximate the time. Fill in End, Duration, and Score for today's row in `sessions.md`.
 
 2. **Compile and run.**
    - `cd` into `code_katas/<name>/YYYY-MM-DD/` and build with the scaffold's build system.
@@ -157,7 +157,7 @@ matmul-tiled     1          2026-03-28     —
    _"Want me to add a knowledge-type Anki note for this gap?"_
 
    If yes:
-   - **Invoke the `ankify` skill** using the Skill tool before writing any notes. This loads the exact format rules; do not rely on memory.
+   - **Invoke the `ankify` skill** before writing any notes. This loads the exact format rules; do not rely on memory.
    - Read the `## Knowledge Notes` section of `sessions.md`.
    - Check for semantic duplicates (same underlying concept, even if worded differently). If a duplicate exists, say so and skip.
    - Otherwise, generate one or more atomic notes in **ankify format** and append them under `## Knowledge Notes` in `sessions.md`.
