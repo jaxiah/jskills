@@ -130,7 +130,7 @@ Optional: comparison table, edge-case note, "why not X?" callout.
 
 ## Neovim integration (codetour.lua)
 
-Located in your Neovim config (`codetour.lua`).
+Bundled at `codetour.lua` in this skill's directory. Copy it into your Neovim config (e.g. `~/.config/nvim/lua/codetour.lua`) and `require` it from your init.
 
 ```
 :TourLoad                   — auto-detect <stem>.tour from current .md buffer
