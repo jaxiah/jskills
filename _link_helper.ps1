@@ -4,6 +4,7 @@ $targets = @(
     Join-Path $env:USERPROFILE '.claude\skills'
     Join-Path $env:USERPROFILE '.gemini\skills'
     Join-Path $env:USERPROFILE '.codex\skills'
+    Join-Path $env:USERPROFILE '.copilot\skills'
 )
 
 $dirs = Get-ChildItem $jskills -Directory | Where-Object { $_.Name -notlike '.*' }

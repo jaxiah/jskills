@@ -52,7 +52,7 @@ If exploring the codebase or designing interfaces reveals that an acceptance cri
 
 **Do not modify the ISSUE file directly.** Instead:
 
-1. Create `BACKLOG/AMENDMENT-of-<ISSUE-filename>.md` using the same format as TDD amendments (see tdd skill).
+1. Create `BACKLOG/PRD-MMM-ISSUE-NNN-AMENDMENT-short-slug.md` using the same format as TDD amendments (see tdd skill).
 2. Stop the design session. Do not work around the problem or silently lower the bar.
 3. Wait for the human to review and resolve the amendment before continuing.
 
@@ -60,8 +60,8 @@ If exploring the codebase or designing interfaces reveals that an acceptance cri
 
 ### 5. Save the design
 
-**Filename convention**: `DESIGN-of-<ISSUE-filename>` — derive directly from the parent ISSUE's filename.
-Example: `ISSUE-004-matmul-tiling.md` → `DESIGN-of-ISSUE-004-matmul-tiling.md`. No global counter needed.
+**Filename convention**: insert `DESIGN-` before the issue slug — derive directly from the parent ISSUE's filename.
+Example: `PRD-002-ISSUE-001-matmul-tiling.md` → `PRD-002-ISSUE-001-DESIGN-matmul-tiling.md`. No separate counter needed.
 
 <design-template>
 

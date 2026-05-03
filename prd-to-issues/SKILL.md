@@ -52,10 +52,11 @@ Iterate until the user approves the breakdown.
 
 ### 5. Create the ISSUE files
 
-**Determine next sequence number**: glob `BACKLOG/*.md`, extract the highest 3-digit prefix across ALL files (PRD-NNN, ISSUE-NNN, RFC-NNN share the same global sequence), increment by 1.
-
-For each approved slice, write a local file to `BACKLOG/` using the filename convention:
-`ISSUE-NNN-short-slug.md`
+**Filename convention**: `PRD-MMM-ISSUE-NNN-short-slug.md`
+- MMM = the parent PRD number (e.g. `002` for `PRD-002-...`)
+- NNN = the issue's own sequence number, scoped to this PRD, starting from 001
+- To find the next NNN: glob `BACKLOG/PRD-MMM-ISSUE-*.md` (where MMM is the parent PRD number), extract the highest NNN, increment by 1. If no issues exist yet for this PRD, start at 001.
+- PRD and ISSUE use **separate counters**. Do not mix them.
 
 Create files in dependency order (blockers first) so you can reference real filenames in the "Blocked by" field.
 
@@ -64,7 +65,7 @@ Do NOT modify the parent PRD file.
 <issue-template>
 ## Parent PRD
 
-[PRD-NNN-slug.md](PRD-NNN-slug.md)
+[PRD-MMM-slug.md](PRD-MMM-slug.md)
 
 ## What to build
 
@@ -80,7 +81,7 @@ Each criterion must trace back to at least one numbered user story from the pare
 
 ## Blocked by
 
-- Blocked by [ISSUE-NNN-slug.md](ISSUE-NNN-slug.md) (if any)
+- Blocked by [PRD-MMM-ISSUE-NNN-slug.md](PRD-MMM-ISSUE-NNN-slug.md) (if any)
 
 Or "None - can start immediately" if no blockers.
 

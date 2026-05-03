@@ -11,7 +11,7 @@ An AMENDMENT file is created when the `design` or `tdd` skill hits a problem it 
 
 ### 1. Locate the AMENDMENT file
 
-Ask the user for the AMENDMENT filename (e.g. `AMENDMENT-of-ISSUE-004-matmul-tiling.md`).
+Ask the user for the AMENDMENT filename (e.g. `PRD-002-ISSUE-004-AMENDMENT-matmul-tiling.md`).
 Read it from `BACKLOG/` using the Read tool.
 
 ### 2. Read the affected files

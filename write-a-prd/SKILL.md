@@ -19,8 +19,8 @@ Check with the user that these modules match their expectations. Check with the 
 
 5. Once you have a complete understanding of the problem and solution, use the template below to write the PRD. Save it as a local file in the project's `BACKLOG/` directory.
 
-**Filename convention**: `PRD-NNN-short-slug.md` where NNN is the next global sequence number.
-To find NNN: glob `BACKLOG/*.md`, extract the highest 3-digit prefix across all files (PRD/ISSUE/RFC), increment by 1.
+**Filename convention**: `PRD-NNN-short-slug.md` where NNN is the next PRD-specific sequence number.
+To find NNN: glob `BACKLOG/PRD-*.md`, extract the highest 3-digit prefix among PRD files only, increment by 1. PRD and ISSUE use separate counters.
 
 <prd-template>
 
