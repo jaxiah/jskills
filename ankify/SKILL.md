@@ -22,6 +22,39 @@ Generate high-quality Anki cards (notes) optimized for long-term retention.
 - **One H4 per Note**: Do not bundle multiple questions under one header.
 - **Atomicity**: If an answer feels too long, split the note.
 
+## Narrow Exception: Synthesis / Process Trace Cards
+
+Atomic cards are the default. A longer synthesis card is allowed only when the target memory is the ability to reconstruct one coherent reasoning process, design path, or causal chain.
+
+Use this exception only if all conditions hold:
+
+1. The card tests one coherent process, not a loose collection of facts.
+2. The process has a clear start state and end state.
+3. The answer can be reconstructed in 3-7 ordered steps.
+4. The card is supported by smaller atomic anchor cards, or those anchor cards are planned.
+5. The prompt explicitly asks for reconstruction, such as "How is X built from Y?", "Why does A force B?", or "Trace how ...".
+6. The card should take 1-2 minutes to answer, not 5+ minutes.
+7. The card must not be used to store general notes, summaries, lecture paragraphs, or personal rambling.
+
+Practical budget:
+
+- Use at most 1 synthesis card per coherent process.
+- Pair each synthesis card with 2-5 atomic anchor cards.
+- If a synthesis card has more than 7 steps, split it.
+- If two synthesis cards share most of the same answer, merge or delete one.
+
+Good synthesis card prompts:
+
+- `How is the lw single-cycle datapath built from the initial state elements?`
+- `Trace why a load-use hazard creates a stall and a bubble in a 5-stage pipeline.`
+- `How does adding R-type instructions force ALUSrc and ResultSrc muxes into the datapath?`
+
+Bad synthesis card prompts:
+
+- `Explain single-cycle processors.`
+- `DDCA chapter 7 summary.`
+- `Things I learned about pipelining.`
+
 ## Format Guidelines (STRICT)
 
 Each note MUST follow one of these exact markdown structures. Never mix them.
