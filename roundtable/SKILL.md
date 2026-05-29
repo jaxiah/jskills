@@ -48,6 +48,18 @@ Run the generated `.cmd` helpers from the current project root.
 
 In examples, `<skill-scripts>\agentturn.cmd` means this agent's generated wrapper in its installed skill `scripts/` directory. `humansay.cmd` means the generated human helper, which may be copied into the current project for convenience.
 
+## Starting a Roundtable
+
+A roundtable starts when the human places the first message on the tabletop from the project root:
+
+```cmd
+humansay.cmd "Topic: <what this roundtable should discuss>"
+```
+
+This creates `.roundtable/messages/0001-human.md` if the roundtable does not already exist.
+
+After the opening human message, the human can ask agents to participate from their own terminals with `/roundtable speak` or `/roundtable ask <question>`.
+
 ### `/roundtable speak`
 
 When the user invokes `/roundtable speak`:

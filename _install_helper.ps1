@@ -25,10 +25,11 @@ foreach ($target in $targets) {
     foreach ($dir in $dirs) {
         $dest = Join-Path $target $dir.Name
         if (Test-Path $dest) {
-            Write-Host "SKIP  $($dir.Name)  (already exists)"
+            Copy-Item -Path (Join-Path $dir.FullName '*') -Destination $dest -Recurse -Force
+            Write-Host "UPDATE  $($dir.Name)"
         } else {
             Copy-Item -LiteralPath $dir.FullName -Destination $dest -Recurse
-            Write-Host "COPY  $($dir.Name)"
+            Write-Host "COPY    $($dir.Name)"
         }
     }
 }

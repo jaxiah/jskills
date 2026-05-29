@@ -10,6 +10,6 @@ Copy `install-targets.local.example.txt` to `install-targets.local.txt`, then ed
 
 Then run `install.cmd` to copy every skill directory in this repo into those targets.
 
-Existing directories are skipped so each agent install can keep local customizations. Delete old junctions or symlinks manually before running `install.cmd` if you want them replaced with real copies.
+Existing skill directories in the target locations are updated in place with `Copy-Item -Force`; matching files are overwritten, and extra local files are left untouched.
 
 `install-targets.local.txt` is intentionally ignored so each machine can maintain its own agent install paths.
