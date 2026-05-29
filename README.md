@@ -1,6 +1,6 @@
 # My Agent Skills
 
-Copy `link-targets.local.example.txt` to `link-targets.local.txt`, then edit it with one agent skills directory per line:
+Copy `install-targets.local.example.txt` to `install-targets.local.txt`, then edit it with one agent skills directory per line:
 
 ```text
 %USERPROFILE%\.claude\skills
@@ -8,6 +8,8 @@ Copy `link-targets.local.example.txt` to `link-targets.local.txt`, then edit it 
 %USERPROFILE%\.codex\skills
 ```
 
-Then run `link.cmd` to link every skill directory in this repo into those targets.
+Then run `install.cmd` to copy every skill directory in this repo into those targets.
 
-`link-targets.local.txt` is intentionally ignored so each machine can maintain its own agent install paths.
+Existing directories are skipped so each agent install can keep local customizations. Delete old junctions or symlinks manually before running `install.cmd` if you want them replaced with real copies.
+
+`install-targets.local.txt` is intentionally ignored so each machine can maintain its own agent install paths.

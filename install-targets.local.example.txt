@@ -1,5 +1,5 @@
 # One agent skills directory per line.
-# Copy this file to link-targets.local.txt and edit it for this machine.
+# Copy this file to install-targets.local.txt and edit it for this machine.
 
 %USERPROFILE%\.claude\skills
 %USERPROFILE%\.gemini\skills
