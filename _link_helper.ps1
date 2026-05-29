@@ -1,11 +1,21 @@
 param([string]$jskills = $PSScriptRoot)
 
-$targets = @(
-    Join-Path $env:USERPROFILE '.claude\skills'
-    Join-Path $env:USERPROFILE '.gemini\skills'
-    Join-Path $env:USERPROFILE '.codex\skills'
-    Join-Path $env:USERPROFILE '.copilot\skills'
-)
+$targetsFile = Join-Path $jskills 'link-targets.local.txt'
+if (-not (Test-Path $targetsFile)) {
+    Write-Error "Missing local target config: $targetsFile"
+    Write-Error "Create it with one agent skills directory per line, for example: %USERPROFILE%\.codex\skills"
+    exit 1
+}
+
+$targets = Get-Content $targetsFile |
+    ForEach-Object { $_.Trim() } |
+    Where-Object { $_ -and -not $_.StartsWith('#') } |
+    ForEach-Object { [Environment]::ExpandEnvironmentVariables($_) }
+
+if (-not $targets) {
+    Write-Error "No link targets found in $targetsFile"
+    exit 1
+}
 
 $dirs = Get-ChildItem $jskills -Directory | Where-Object { $_.Name -notlike '.*' }
 
