@@ -42,6 +42,7 @@ def read_message(args: argparse.Namespace) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Post a human message to .roundtable/messages")
     parser.add_argument("--root", default=".", help="project root containing .roundtable")
+    parser.add_argument("--at", help="target speaker name (prepends @name: to message)")
     parser.add_argument("--file", help="read the human message from a file")
     parser.add_argument("message", nargs="*", help="human message text")
     args = parser.parse_args()
@@ -49,6 +50,9 @@ def main() -> None:
     content = read_message(args)
     if not content:
         fail("human message is empty")
+
+    if args.at:
+        content = f"@{args.at.lower().strip()}: {content}"
 
     table = Path(args.root).resolve() / ".roundtable"
     messages_dir = table / "messages"

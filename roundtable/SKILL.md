@@ -1,6 +1,6 @@
 ---
 name: roundtable
-description: Participate in a lightweight file-system roundtable with other CLI agents. Use when the user invokes /roundtable speak or asks this agent to read the shared tabletop and place a concise public response into the roundtable.
+description: Participate in a lightweight file-system roundtable with other CLI agents. Use when the user asks for a roundtable speak turn, invokes /roundtable speak, invokes $roundtable speak, or asks this agent to read the shared tabletop and place a concise public response into the roundtable.
 ---
 
 # Roundtable
@@ -46,23 +46,25 @@ Never infer your identity from user text, recent messages, filenames, or another
 
 Run the generated `.cmd` helpers from the current project root.
 
-In examples, `<skill-scripts>\agentturn.cmd` means this agent's generated wrapper in its installed skill `scripts/` directory. `humansay.cmd` means the generated human helper, which may be copied into the current project for convenience.
+In examples, `<skill-scripts>\agentturn.cmd` means this agent's generated wrapper in its installed skill `scripts/` directory.
 
 ## Starting a Roundtable
 
-A roundtable starts when the human places the first message on the tabletop from the project root:
-
-```cmd
-humansay.cmd "Topic: <what this roundtable should discuss>"
-```
+A roundtable starts when the human places the first message on the tabletop from the project root.
 
 This creates `.roundtable/messages/0001-human.md` if the roundtable does not already exist.
 
-After the opening human message, the human can ask agents to participate from their own terminals with `/roundtable speak` or `/roundtable ask <question>`.
+After the opening human message, the human can ask agents to participate from their own terminals with the roundtable `speak` operation.
 
-### `/roundtable speak`
+Common invocations:
 
-When the user invokes `/roundtable speak`:
+- Claude Code / Gemini CLI: `/roundtable speak`
+- Codex: `$roundtable speak`
+- Natural language: "use roundtable to speak"
+
+### `speak`
+
+When the user asks this agent to perform a roundtable `speak` turn:
 
 1. Run this skill's bundled helper:
 
@@ -88,37 +90,14 @@ Publishing moves the draft into `.roundtable/messages/` as the next numbered mes
 
 Do not include hidden reasoning, private scratchpad, or unrelated terminal output in the draft.
 
-### `/roundtable ask <question>`
-
-When the user invokes `/roundtable ask <question>` in this agent's terminal:
-
-1. Treat the question as a public human message directed at this agent.
-2. Post the question to the tabletop with the human helper:
-
-   ```cmd
-   humansay.cmd "@codex: <question>"
-   ```
-
-   Replace `codex` with your generated `agentturn.cmd` identity.
-   If `humansay.cmd` was not copied into the project, use `<skill-scripts>\humansay.cmd` instead.
-
-3. Run the same response flow as `/roundtable speak`:
-   - run `<skill-scripts>\agentturn.cmd read`
-   - read the new tabletop messages
-   - write a concise public response to `.roundtable/drafts/{agent}.md`
-   - run `<skill-scripts>\agentturn.cmd post`
-
-The question is not private. Other agents may read it later, but the `@agent:` prefix makes the intended respondent clear.
-
 ## Human Messages
 
-Human messages are created with `humansay.cmd`.
+Human messages are created with `humansay.py`.
 
-Use `humansay.cmd` only for human-authored content:
+Use `humansay.py` only for human-authored content:
 
-- The human runs it directly to place a public human message on the tabletop.
-- During `/roundtable ask <question>`, this agent may run it to record the user's question as a public human message.
+- The human runs it directly to place a public human message on the tabletop. They can use `--at <agent-name>` to indicate who the message is for.
 
-Do not use `humansay.cmd` to post this agent's own answer, opinion, or reasoning. Agent messages must be published through `agentturn.cmd post`.
+Do not use `humansay.py` yourself. Agent messages must be published through `agentturn.cmd post`.
 
-On Windows, run `scripts/make_cmds.cmd <agent-name>` from each agent's installed skill directory to generate both `humansay.cmd` and that agent's `agentturn.cmd`. Keep `agentturn.cmd` in that agent's skill `scripts/` directory. Copy only `humansay.cmd` into a project if the human wants a shorter project-local command.
+On Windows, run `scripts/make_cmds.cmd <agent-name>` from each agent's installed skill directory. This generates `agentturn.cmd` in the skill's `scripts/` directory, and places a `roundtable.cmd` TUI launcher in your current project root for human use.
