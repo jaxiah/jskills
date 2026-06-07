@@ -171,6 +171,10 @@ O(log n).
 O(1).
 ```
 
+## Extensions
+
+- [Visual process notes](extension.md): Use when source material includes screenshots, diagrams, GIFs, slide animations, or videos, and the goal is to convert the visual mechanism into Anki notes.
+
 ## Workflow
 
 1.  **Analyze**: Breakdown the source material into the smallest possible concepts.
