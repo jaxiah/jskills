@@ -13,6 +13,8 @@ Generate high-quality Anki cards (notes) optimized for long-term retention.
 2.  **No Enumerations**: Avoid "List 5 factors..." or complex sequences. Use cloze deletions or split into multiple atomic questions.
 3.  **No Ambiguity**: Every question must be self-contained and interpreted exactly one way.
 4.  **20 Rules of Knowledge Formulation**: Refer to [20-rules.md](references/20-rules.md) for deep principles.
+5.  **Balanced Front/Back**: The front prompt must provide enough context to make the expected answer recallable. Avoid tiny generic questions with large complex answers. If the answer needs several constraints, examples, or comparisons, either use Context-Extended Format to put that context on the front, or split the note.
+6.  **Answer Only the Front**: The back should answer only what the front asks. Do not add adjacent background, tradeoffs, related concepts, or recap unless needed for the asked recall.
 
 ## Strict Constraints & Pitfalls
 
@@ -21,39 +23,44 @@ Generate high-quality Anki cards (notes) optimized for long-term retention.
 - **No Empty Backs**: If you use `---`, there MUST be content after it.
 - **One H4 per Note**: Do not bundle multiple questions under one header.
 - **Atomicity**: If an answer feels too long, split the note.
+- **Front/Back Imbalance**: If the front is a short label like "What is X?" but the back explains several mechanisms, tradeoffs, or cases, the note is malformed. Add front-side context, narrow the question, or split it.
 
-## Narrow Exception: Synthesis / Process Trace Cards
+## Rare Exception: Process Trace Cards
 
-Atomic cards are the default. A longer synthesis card is allowed only when the target memory is the ability to reconstruct one coherent reasoning process, design path, or causal chain.
+Atomic cards are the default. A process trace card is allowed only when the user explicitly wants to remember a coherent process, design path, or causal chain. Do not use this exception for ordinary definitions, comparisons, mechanisms, pros/cons, or summaries.
 
 Use this exception only if all conditions hold:
 
-1. The card tests one coherent process, not a loose collection of facts.
-2. The process has a clear start state and end state.
-3. The answer can be reconstructed in 3-7 ordered steps.
-4. The card is supported by smaller atomic anchor cards, or those anchor cards are planned.
-5. The prompt explicitly asks for reconstruction, such as "How is X built from Y?", "Why does A force B?", or "Trace how ...".
-6. The card should take 1-2 minutes to answer, not 5+ minutes.
-7. The card must not be used to store general notes, summaries, lecture paragraphs, or personal rambling.
+1. The prompt explicitly asks the learner to reconstruct a process, such as "Trace how ...", "How is X built from Y?", or "Why does A force B?".
+2. The card has a clear start state and end state.
+3. The answer can be reconstructed in 3-5 ordered steps.
+4. The card tests one causal chain, not a loose collection of related facts.
+5. The card is supported by smaller atomic anchor cards, or those anchor cards are planned.
+6. The back should stay under roughly 120-150 words.
+
+Process trace formatting:
+
+- Prefer 3-5 numbered steps only for process trace cards.
+- Do not use this as a general license to write bullet lists.
+- Standard atomic notes should usually be 1-3 short sentences, not bullets.
 
 Practical budget:
 
-- Use at most 1 synthesis card per coherent process.
-- Pair each synthesis card with 2-5 atomic anchor cards.
-- If a synthesis card has more than 7 steps, split it.
-- If two synthesis cards share most of the same answer, merge or delete one.
+- Use at most 1 process trace card per coherent process.
+- If a process trace card needs more than 5 steps, split it or create anchor notes instead.
+- If two process trace cards share most of the same answer, merge or delete one.
 
-Good synthesis card prompts:
+Good process trace prompts:
 
+- `Trace how a load-use hazard creates a stall and a bubble in a 5-stage pipeline.`
 - `How is the lw single-cycle datapath built from the initial state elements?`
-- `Trace why a load-use hazard creates a stall and a bubble in a 5-stage pipeline.`
-- `How does adding R-type instructions force ALUSrc and ResultSrc muxes into the datapath?`
 
-Bad synthesis card prompts:
+Bad process trace prompts:
 
 - `Explain single-cycle processors.`
 - `DDCA chapter 7 summary.`
-- `Things I learned about pipelining.`
+- `What is register renaming?`
+- `Compare superscalar and VLIW.`
 
 ## Format Guidelines (STRICT)
 
