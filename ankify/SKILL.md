@@ -9,21 +9,33 @@ Generate high-quality Anki cards (notes) optimized for long-term retention.
 
 ## Core Rules
 
-1.  **Strict Atomicity**: Each card must address a single, granular fact.
-2.  **No Enumerations**: Avoid "List 5 factors..." or complex sequences. Use cloze deletions or split into multiple atomic questions.
-3.  **No Ambiguity**: Every question must be self-contained and interpreted exactly one way.
-4.  **20 Rules of Knowledge Formulation**: Refer to [20-rules.md](references/20-rules.md) for deep principles.
-5.  **Balanced Front/Back**: The front prompt must provide enough context to make the expected answer recallable. Avoid tiny generic questions with large complex answers. If the answer needs several constraints, examples, or comparisons, either use Context-Extended Format to put that context on the front, or split the note.
-6.  **Answer Only the Front**: The back should answer only what the front asks. Do not add adjacent background, tradeoffs, related concepts, or recap unless needed for the asked recall.
+Default to Wozniak's [20 Rules of Knowledge Formulation](references/20-rules.md), especially the minimum information principle. Most notes should be small enough to answer quickly, not mini-explanations.
 
-## Strict Constraints & Pitfalls
+Operational guardrails:
+
+1. **One minimum fact**: Before drafting, identify the single fact this card tests. If there are multiple facts, split the note.
+2. **Recall-friendly back**: The back should be the shortest answer that fully satisfies the front. Prefer 1-2 sentences.
+3. **Balanced front/back**: A long front is acceptable when it provides context for precise recall. A long back is usually a warning sign.
+4. **No extra explanation**: Do not add recaps, mnemonics, tradeoffs, adjacent background, or "why this matters" unless the front asks for them.
+5. **Unambiguous prompt**: The question should be self-contained enough to have exactly one intended answer.
+
+## Recall-Friendly Back Answers
+
+Before drafting a note, identify the single minimum fact the card is testing. If that fact cannot be stated in one sentence, narrow the prompt or split the note.
+
+The back should be the shortest answer that fully satisfies the front. Prefer 1-2 sentences. Do not add recaps, mnemonics, tradeoffs, adjacent background, or "why this matters" unless the front explicitly asks for them.
+
+A long front is acceptable when it provides context needed for precise recall. A long back is usually a warning sign: move necessary disambiguating context to the front, or split the note.
+
+When source material is a list of key points, do not turn each point into a long explanatory note. First reduce each point to the smallest recall target, then write the shortest prompt/back pair that tests that target.
+
+## Formatting Constraints & Pitfalls
 
 - **No Note Separators**: NEVER use `---` to separate multiple notes. The `---` is ONLY used to separate the front and back of a _single_ Context-Extended note.
 - **No Trailing Separators**: Never end a note or a file with `---`.
 - **No Empty Backs**: If you use `---`, there MUST be content after it.
 - **One H4 per Note**: Do not bundle multiple questions under one header.
-- **Atomicity**: If an answer feels too long, split the note.
-- **Front/Back Imbalance**: If the front is a short label like "What is X?" but the back explains several mechanisms, tradeoffs, or cases, the note is malformed. Add front-side context, narrow the question, or split it.
+- **Long Back Warning**: If the back feels long, move necessary context to the front, narrow the prompt, or split the note.
 
 ## Rare Exception: Process Trace Cards
 
@@ -80,6 +92,7 @@ Use this for **90% of notes**. If the question is self-sufficient, use this. NO 
 
 Use **ONLY** when the prompt needs a code snippet, diagram, or situational constraint to avoid ambiguity without cluttering the H4 title.
 Exactly ONE `---` to separate front from back. _(Leave exactly one blank line before and after the `---` separator to prevent markdown rendering errors)._ NEVER put a `---` at the very end of the note.
+Everything before `---` is the front-side context/setup, and everything after `---` is the back answer. Do not add extra metadata fields or labels to restate this structure.
 
 ```markdown
 #### <specific front prompt / main question>
@@ -93,7 +106,7 @@ Exactly ONE `---` to separate front from back. _(Leave exactly one blank line be
 
 ## Examples of Rule Application
 
-### Example 1: Atomicity & Open-Ended Prompts (Knowledge Rule)
+### Example 1: Minimum Fact & Open-Ended Prompts (Knowledge Rule)
 
 **Bad Example** (Violates: specific prompts, 15-second rule, generic H4 title)
 
@@ -139,13 +152,13 @@ All threads within the same **thread block**.
 **Good Example** (Targets specific mechanisms with unique prompts and context)
 
 ```markdown
-#### Which attention algorithm avoids materializing the large attention matrix to minimize memory bandwidth overhead?
+#### Which attention algorithm avoids materializing the large attention matrix during attention?
 
-Context: VLM Inference Optimization during autoregressive generation.
+Autoregressive inference is memory-bandwidth sensitive, and materializing the full attention matrix would add large memory traffic.
 
 ---
 
-**FlashAttention** (or PagedAttention for efficient KV cache management).
+**FlashAttention**.
 ```
 
 ### Example 3: Multiple Notes Formatting (Formatting Rule)
@@ -185,6 +198,7 @@ O(1).
 ## Workflow
 
 1.  **Analyze**: Breakdown the source material into the smallest possible concepts.
-2.  **Formulate**: Draft questions that are short, clear, and unambiguous.
-3.  **Format**: Apply either the Standard or Context-Extended format strictly based on complexity.
-4.  **Validate**: Ensure the answer is concise and directly addresses the question.
+2.  **Identify minimum fact**: State the one fact this note tests before drafting the note. If there are multiple facts, split them.
+3.  **Formulate**: Draft questions that are short, clear, and unambiguous, with enough front-side context for recall.
+4.  **Format**: Apply either the Standard or Context-Extended format strictly based on complexity.
+5.  **Validate**: Ensure the answer is concise and directly addresses the question. Delete any back sentence that answers something the front did not ask.

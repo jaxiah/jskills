@@ -2,7 +2,7 @@
 
 Use this extension when source material includes screenshots, diagrams, GIFs, slide animations, videos, or extracted key frames, and the goal is to turn a visual mechanism into high-quality Anki notes.
 
-This extension does not replace the core Ankify rules. Atomicity, unambiguous prompts, one H4 per note, and the standard or context-extended formats still apply.
+This extension does not replace the core Ankify rules. Minimum facts, unambiguous prompts, one H4 per note, and the standard or context-extended formats still apply.
 
 ## Goal
 
@@ -37,8 +37,8 @@ Bad targets:
 4. Use context-extended notes when the image is needed.
    Put the image, key frame, or minimal setup on the front. Put the reconstruction on the back. Use exactly one `---` only for the front/back boundary.
 
-5. Keep the back to 3-6 steps.
-   A visual process card should be answerable in 1-2 minutes. If it needs more steps, split it into anchor cards or a smaller process card.
+5. Keep process-trace backs to 3-5 steps.
+   Use steps only when the visual target is a genuine process or state transition. Otherwise keep the back short, usually 1-2 sentences. If a process needs more than 5 steps, split it into anchor cards or a smaller process card.
 
 6. Correct misleading explanations.
    Replace visual-proximity explanations with mechanism explanations. For example, replace "because the instructions are adjacent" with "because the rename table current mapping points to that producer."
@@ -77,11 +77,11 @@ Use a context-extended note when the visual is required:
 
 ![[image-or-frame.png|900]]
 
-Context: <minimal setup needed to interpret the visual>.
+<minimal setup needed to interpret the visual>.
 
 ---
 
-<3-6 step reconstruction of the mechanism.>
+<short answer, or a 3-5 step reconstruction for a true process trace.>
 ```
 
 Use a standard note when the visual is only supporting evidence and the prompt is already self-contained.
@@ -110,6 +110,7 @@ Common useful targets:
 
 - The front includes enough context to make the image interpretable in a large mixed deck.
 - The back explains one mechanism, not the whole slide.
+- The back answers the mechanism named in the front, not every visible detail in the image.
 - The answer distinguishes observed state from inferred rule.
 - The note avoids vague phrases like "this is important" or "as shown above."
 - The note avoids relying on visual proximity when the real cause is a table mapping, tag match, dependency, or program order rule.
