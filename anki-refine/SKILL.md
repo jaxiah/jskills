@@ -14,7 +14,8 @@ Refine Obsidian Markdown h4 blocks that represent Anki notes.
 3. By default, do not write files. First provide the refined note in the chat for review.
 4. Iterate in chat until the user approves the exact wording.
 5. Only write back when the user explicitly gives a clear apply instruction, such as `apply` or `write back`.
-6. When applying, replace only the matched h4 block. Do not modify unrelated notes.
+6. When in doubt, treat the request as review/proposal-only. Never infer writeback permission from the fact that the user supplied exact replacement text.
+7. When applying, replace only the matched h4 block. Do not modify unrelated notes.
 
 When rewriting Anki note content, also follow the `ankify` skill. `anki-refine` controls locating, review, and write-back workflow. `ankify` controls note quality.
 
