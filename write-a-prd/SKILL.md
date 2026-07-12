@@ -1,6 +1,6 @@
 ---
 name: write-a-prd
-description: Create a PRD through user interview, codebase exploration, and module design, then submit as a GitHub issue. Use when user wants to write a PRD, create a product requirements document, or plan a new feature.
+description: Create a PRD through user interview, codebase exploration, and module design, then save it as a local Markdown file in the project's BACKLOG directory. Never create or submit a GitHub issue. Use when user wants to write a PRD, create a product requirements document, or plan a new feature.
 ---
 
 This skill is the entry point of the feature development workflow. See [workflow.md](workflow.md) for the full pipeline: PRD → ISSUE → DESIGN → TDD.

@@ -26,17 +26,21 @@ Preferred locators:
 - `^anki-...` anchor: globally unique and most reliable.
 - `#### ...` h4 heading text: acceptable when the user provides the exact heading and it is unique in the vault.
 
+Prefer the narrowest known Markdown file scope. If the user names a `.md` file, the recent context clearly identifies the note file, or a nearby note was just edited in the same file, run `rg` directly against that `.md` file first. Do not start with a vault-wide search unless the target file is unknown.
+
 Use literal search for an anchor:
 
 ```powershell
-rg -n "\^anki-123" .
+rg -n "\^anki-123" "path/to/note.md"
 ```
 
 Use literal search for a h4 heading:
 
 ```powershell
-rg -n -F "#### exact heading text" .
+rg -n -F "#### exact heading text" "path/to/note.md"
 ```
+
+If the `.md` file is unknown, then search the smallest likely folder first, such as `ddca/`, before falling back to `.`.
 
 After finding the target, read the full h4 block: from the matched `#### ` heading through the line before the next `#### ` heading, or EOF. If locating by h4 heading, confirm the full heading line is an exact match before applying. If locating by anchor, first find the preceding `#### ` heading. Preserve the anchor line unless the user explicitly asks to remove it.
 
