@@ -29,6 +29,15 @@ A long front is acceptable when it provides context needed for precise recall. A
 
 When source material is a list of key points, do not turn each point into a long explanatory note. First reduce each point to the smallest recall target, then write the shortest prompt/back pair that tests that target.
 
+## Scaffolded Fronts for Complex Knowledge
+
+For complex, highly connected knowledge, the front may intentionally carry a fairly complete scaffold, such as a diagram, table, setup, assumptions, comparison, or partial causal chain. Reading this scaffold during every review is itself reinforcement, not automatically an unwanted hint.
+
+- Ask the learner to recall one core distinction, conclusion, or missing link from the scaffold.
+- Avoid a tiny abstract front paired with a much larger explanatory back.
+- When rebalancing a top-heavy back, first move useful context and structure to the front instead of deleting it.
+- Do not confuse the minimum information principle with minimum context: keep the recall target atomic while giving it enough front-side support.
+
 ## Formatting Constraints & Pitfalls
 
 - **No Note Separators**: NEVER use `---` to separate multiple notes. The `---` is ONLY used to separate the front and back of a _single_ Context-Extended note.
@@ -90,7 +99,7 @@ Use this for **90% of notes**. If the question is self-sufficient, use this. NO 
 
 ### 2. Context-Extended Format (Complex Prompts)
 
-Use **ONLY** when the prompt needs a code snippet, diagram, or situational constraint to avoid ambiguity without cluttering the H4 title.
+Use **ONLY** when the prompt needs a code snippet, diagram, situational constraint, or intentional knowledge scaffold that supports recall of a complex mechanism without cluttering the H4 title.
 Exactly ONE `---` to separate front from back. _(Leave exactly one blank line before and after the `---` separator to prevent markdown rendering errors)._ NEVER put a `---` at the very end of the note.
 Everything before `---` is the front-side context/setup, and everything after `---` is the back answer. Do not add extra metadata fields or labels to restate this structure.
 
