@@ -31,16 +31,17 @@ When source material is a list of key points, do not turn each point into a long
 
 ## Scaffolded Fronts for Complex Knowledge
 
-For complex, highly connected knowledge, the front may intentionally carry a fairly complete scaffold, such as a diagram, table, setup, assumptions, comparison, or partial causal chain. Reading this scaffold during every review is itself reinforcement, not automatically an unwanted hint.
+For complex, highly connected knowledge, the front may intentionally carry a fairly complete scaffold, such as a diagram, table, setup, assumptions, comparison, or known intermediate states. Reading this scaffold during every review is itself reinforcement, not automatically an unwanted hint.
 
 - Ask the learner to recall one core distinction, conclusion, or missing link from the scaffold.
 - Avoid a tiny abstract front paired with a much larger explanatory back.
 - When rebalancing a top-heavy back, first move useful context and structure to the front instead of deleting it.
 - Do not confuse the minimum information principle with minimum context: keep the recall target atomic while giving it enough front-side support.
+- If the learner must reconstruct the ordered chain itself, use a process trace card only when the conditions below are met.
 
 ## Formatting Constraints & Pitfalls
 
-- **No Note Separators**: NEVER use `---` to separate multiple notes. The `---` is ONLY used to separate the front and back of a _single_ Context-Extended note.
+- **No Note Separators**: NEVER use `---` to separate multiple notes. Use it only within a single note, between a Basic prompt and answer or a Cloze prompt and its answer-side supplement.
 - **No Trailing Separators**: Never end a note or a file with `---`.
 - **No Empty Backs**: If you use `---`, there MUST be content after it.
 - **One H4 per Note**: Do not bundle multiple questions under one header.
@@ -48,11 +49,11 @@ For complex, highly connected knowledge, the front may intentionally carry a fai
 
 ## Rare Exception: Process Trace Cards
 
-Atomic cards are the default. A process trace card is allowed only when the user explicitly wants to remember a coherent process, design path, or causal chain. Do not use this exception for ordinary definitions, comparisons, mechanisms, pros/cons, or summaries.
+Atomic cards are the default. Unlike a scaffolded front, a process trace card tests recall of the ordered chain itself, not one missing fact within it. Its front may still provide context. Use this exception only when the user explicitly wants to remember a coherent process, design path, or causal chain. Do not use it for ordinary definitions, comparisons, mechanisms, pros/cons, or summaries.
 
 Use this exception only if all conditions hold:
 
-1. The prompt explicitly asks the learner to reconstruct a process, such as "Trace how ...", "How is X built from Y?", or "Why does A force B?".
+1. The prompt explicitly asks the learner to reconstruct a process, such as "Trace how ...", "How is X built from Y?", or "Trace the intermediate steps from A to B."
 2. The card has a clear start state and end state.
 3. The answer can be reconstructed in 3-5 ordered steps.
 4. The card tests one causal chain, not a loose collection of related facts.
@@ -89,7 +90,7 @@ Each note MUST follow one of these exact markdown structures. Never mix them.
 
 ### 1. Standard Format (Simple Q&A)
 
-Use this for **90% of notes**. If the question is self-sufficient, use this. NO horizontal separator (`---`) allowed anywhere.
+Use this for most Basic Q&A notes. If the question is self-sufficient, use this. NO horizontal separator (`---`) allowed anywhere.
 
 ```markdown
 #### <specific front prompt / main question>
@@ -111,6 +112,60 @@ Everything before `---` is the front-side context/setup, and everything after `-
 ---
 
 <back answer>
+```
+
+### 3. Cloze Format
+
+Use one `####` heading per note. Put at least one deletion in the heading or in the text before any separator, using `{{c1::hidden text}}` or `{{c1::hidden text::hint}}`. Use different numbers (`c1`, `c2`, ...) for separate cards; repeat a number when multiple deletions should be hidden on the same card.
+
+Without `---`, the heading and entire body are shown while recalling. If supplementary content is needed after revealing the answer, put exactly one `---` after the cloze text, with exactly one blank line on each side. Everything after `---` is shown after revealing the answer on every card generated from the note. That content must be nonempty. Do not put the only cloze deletion below `---`.
+
+**One deletion, no supplement:** One cloze number creates one card; no `---` is needed.
+
+```markdown
+#### Queue removal order
+
+A queue removes the {{c1::oldest}} item first.
+```
+
+**Independent deletions:** `c1` and `c2` create two cards, each hiding one part of the relationship.
+
+```markdown
+#### Queue insertion and removal ends
+
+A queue inserts at the {{c1::tail}} and removes from the {{c2::head}}.
+```
+
+**Grouped deletions:** Repeating `c1` creates one card that hides both parts together.
+
+```markdown
+#### Queue insertion and removal as one pair
+
+A queue {{c1::inserts at the tail}} and {{c1::removes from the head}}.
+```
+
+**Hint and answer-side supplement:** The hint appears while recalling; the text after `---` appears only after revealing the answer.
+
+```markdown
+#### LRU cache eviction
+
+An LRU cache evicts the {{c1::least recently used::recency criterion}} entry.
+
+---
+
+Recency refers to accesses, not insertion order.
+```
+
+**Invalid placement:** This is not a Cloze-format note because its only deletion is below `---`.
+
+```markdown
+#### LRU cache eviction
+
+Which entry does the cache evict?
+
+---
+
+The {{c1::least recently used}} entry.
 ```
 
 ## Examples of Rule Application
@@ -200,14 +255,10 @@ O(log n).
 O(1).
 ```
 
-## Extensions
-
-- [Visual process notes](extension.md): Use when source material includes screenshots, diagrams, GIFs, slide animations, or videos, and the goal is to convert the visual mechanism into Anki notes.
-
 ## Workflow
 
 1.  **Analyze**: Breakdown the source material into the smallest possible concepts.
 2.  **Identify minimum fact**: State the one fact this note tests before drafting the note. If there are multiple facts, split them.
 3.  **Formulate**: Draft questions that are short, clear, and unambiguous, with enough front-side context for recall.
-4.  **Format**: Apply either the Standard or Context-Extended format strictly based on complexity.
+4.  **Format**: Apply the Standard, Context-Extended, or Cloze format according to the intended recall.
 5.  **Validate**: Ensure the answer is concise and directly addresses the question. Delete any back sentence that answers something the front did not ask.
