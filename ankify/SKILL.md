@@ -9,35 +9,15 @@ Generate high-quality Anki cards (notes) optimized for long-term retention.
 
 ## Core Rules
 
-Default to Wozniak's [20 Rules of Knowledge Formulation](references/20-rules.md), especially the minimum information principle. Most notes should be small enough to answer quickly, not mini-explanations.
+Default to Wozniak's [20 Rules of Knowledge Formulation](references/20-rules.md), especially the minimum information principle. Most cards should be quick to answer, not mini-explanations. Keep the recall target small without imposing a fixed front/back length ratio.
 
-Operational guardrails:
+1. **One recall target per card.** Before drafting, identify the single fact, distinction, or missing link the card tests. If the target cannot be stated in one sentence, narrow the prompt or split the card. For source lists, reduce each point to its smallest useful recall target.
 
-1. **One minimum fact**: Before drafting, identify the single fact this card tests. If there are multiple facts, split the note.
-2. **Recall-friendly back**: The back should be the shortest answer that fully satisfies the front. Prefer 1-2 sentences.
-3. **Balanced front/back**: A long front is acceptable when it provides context for precise recall. A long back is usually a warning sign.
-4. **No extra explanation**: Do not add recaps, mnemonics, tradeoffs, adjacent background, or "why this matters" unless the front asks for them.
-5. **Unambiguous prompt**: The question should be self-contained enough to have exactly one intended answer.
+2. **Unambiguous prompt.** The front must stand on its own during review and specify what is being asked clearly enough to have exactly one intended answer. Do not make the learner guess the scope or level of detail.
 
-## Recall-Friendly Back Answers
+3. **Shortest sufficient answer.** The back should fully satisfy the prompt, preferably in 1-2 sentences. Do not add recaps, tradeoffs, adjacent background, or "why this matters" unless the prompt asks for them. Use mnemonics when they directly support recall, not as unrelated answer padding.
 
-Before drafting a note, identify the single minimum fact the card is testing. If that fact cannot be stated in one sentence, narrow the prompt or split the note.
-
-The back should be the shortest answer that fully satisfies the front. Prefer 1-2 sentences. Do not add recaps, mnemonics, tradeoffs, adjacent background, or "why this matters" unless the front explicitly asks for them.
-
-A long front is acceptable when it provides context needed for precise recall. A long back is usually a warning sign: move necessary disambiguating context to the front, or split the note.
-
-When source material is a list of key points, do not turn each point into a long explanatory note. First reduce each point to the smallest recall target, then write the shortest prompt/back pair that tests that target.
-
-## Scaffolded Fronts for Complex Knowledge
-
-For complex, highly connected knowledge, the front may intentionally carry a fairly complete scaffold, such as a diagram, table, setup, assumptions, comparison, or known intermediate states. Reading this scaffold during every review is itself reinforcement, not automatically an unwanted hint.
-
-- Ask the learner to recall one core distinction, conclusion, or missing link from the scaffold.
-- Avoid a tiny abstract front paired with a much larger explanatory back.
-- When rebalancing a top-heavy back, first move useful context and structure to the front instead of deleting it.
-- Do not confuse the minimum information principle with minimum context: keep the recall target atomic while giving it enough front-side support.
-- If the learner must reconstruct the ordered chain itself, use a process trace card only when the conditions below are met.
+4. **Balanced context.** Put enough context on the front to make the recall target clear and situate it within a coherent idea. A diagram, table, or setup may be worth revisiting even when every detail is not needed to produce the answer. Keep that context relevant and proportionate to the learning objective: avoid both a bare prompt with a long explanatory back and a large reference page testing a trivial detail. If the back grows long, move necessary context to the front, narrow the target, or split the card. Judge balance by relevance and cognitive load, not by matching front and back lengths.
 
 ## Formatting Constraints & Pitfalls
 
@@ -46,43 +26,6 @@ For complex, highly connected knowledge, the front may intentionally carry a fai
 - **No Empty Backs**: If you use `---`, there MUST be content after it.
 - **One H4 per Note**: Do not bundle multiple questions under one header.
 - **Long Back Warning**: If the back feels long, move necessary context to the front, narrow the prompt, or split the note.
-
-## Rare Exception: Process Trace Cards
-
-Atomic cards are the default. Unlike a scaffolded front, a process trace card tests recall of the ordered chain itself, not one missing fact within it. Its front may still provide context. Use this exception only when the user explicitly wants to remember a coherent process, design path, or causal chain. Do not use it for ordinary definitions, comparisons, mechanisms, pros/cons, or summaries.
-
-Use this exception only if all conditions hold:
-
-1. The prompt explicitly asks the learner to reconstruct a process, such as "Trace how ...", "How is X built from Y?", or "Trace the intermediate steps from A to B."
-2. The card has a clear start state and end state.
-3. The answer can be reconstructed in 3-5 ordered steps.
-4. The card tests one causal chain, not a loose collection of related facts.
-5. The card is supported by smaller atomic anchor cards, or those anchor cards are planned.
-6. The back should stay under roughly 120-150 words.
-
-Process trace formatting:
-
-- Prefer 3-5 numbered steps only for process trace cards.
-- Do not use this as a general license to write bullet lists.
-- Standard atomic notes should usually be 1-3 short sentences, not bullets.
-
-Practical budget:
-
-- Use at most 1 process trace card per coherent process.
-- If a process trace card needs more than 5 steps, split it or create anchor notes instead.
-- If two process trace cards share most of the same answer, merge or delete one.
-
-Good process trace prompts:
-
-- `Trace how a load-use hazard creates a stall and a bubble in a 5-stage pipeline.`
-- `How is the lw single-cycle datapath built from the initial state elements?`
-
-Bad process trace prompts:
-
-- `Explain single-cycle processors.`
-- `DDCA chapter 7 summary.`
-- `What is register renaming?`
-- `Compare superscalar and VLIW.`
 
 ## Format Guidelines (STRICT)
 
@@ -172,7 +115,7 @@ The {{c1::least recently used}} entry.
 
 ### Example 1: Minimum Fact & Open-Ended Prompts (Knowledge Rule)
 
-**Bad Example** (Violates: specific prompts, 15-second rule, generic H4 title)
+**Bad Example** (Violates: specific prompts, minimum information, generic H4 title)
 
 ```markdown
 #### CUDA Shared Memory
@@ -258,7 +201,7 @@ O(1).
 ## Workflow
 
 1.  **Analyze**: Breakdown the source material into the smallest possible concepts.
-2.  **Identify minimum fact**: State the one fact this note tests before drafting the note. If there are multiple facts, split them.
+2.  **Identify recall target**: State the one target each card tests before drafting. In Cloze notes, each distinct `cN` generates a card, so evaluate each target separately; split cards that bundle unrelated facts.
 3.  **Formulate**: Draft questions that are short, clear, and unambiguous, with enough front-side context for recall.
 4.  **Format**: Apply the Standard, Context-Extended, or Cloze format according to the intended recall.
 5.  **Validate**: Ensure the answer is concise and directly addresses the question. Delete any back sentence that answers something the front did not ask.
