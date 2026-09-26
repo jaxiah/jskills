@@ -9,13 +9,13 @@ Generate high-quality Anki cards (notes) optimized for long-term retention.
 
 ## Core Rules
 
-Default to Wozniak's [20 Rules of Knowledge Formulation](references/20-rules.md), especially the minimum information principle. Most cards should be quick to answer, not mini-explanations. Keep the recall target small without imposing a fixed front/back length ratio.
+Use Wozniak's [20 Rules of Knowledge Formulation](references/20-rules.md) and Nielsen's [Augmenting Long-term Memory](references/augmenting-long-term-memory.md) as card-design defaults, especially the minimum information principle. Adapt these heuristics to the learner's goals, current understanding, and explicit preferences; the Note Format below remains a structural requirement. Most cards should be quick to answer, not mini-explanations. Keep the recall target small without imposing a fixed front/back length ratio.
 
 1. **One recall target per card.** Before drafting, identify the single fact, distinction, or missing link the card tests. If the target cannot be stated in one sentence, narrow the prompt or split the card. For source lists, reduce each point to its smallest useful recall target.
 
 2. **Unambiguous prompt.** The front must stand on its own during review and specify what is being asked clearly enough to have exactly one intended answer. Do not make the learner guess the scope or level of detail.
 
-3. **Shortest sufficient answer.** The back should fully satisfy the prompt, preferably in 1-2 sentences. Do not add recaps, tradeoffs, adjacent background, or "why this matters" unless the prompt asks for them. Use mnemonics when they directly support recall, not as unrelated answer padding.
+3. **Shortest sufficient answer.** For Basic cards, the back should fully satisfy the prompt, preferably in 1-2 sentences. For Cloze cards, the deleted text is the recalled answer; any answer-side supplement should clarify it rather than add an unrelated target. Do not add recaps, tradeoffs, adjacent background, or "why this matters" unless the prompt asks for them. Use mnemonics when they directly support recall, not as unrelated answer padding.
 
 4. **Balanced context.** Put enough context on the front to make the recall target clear and situate it within a coherent idea. A diagram, table, or setup may be worth revisiting even when every detail is not needed to produce the answer. Keep that context relevant and proportionate to the learning objective: avoid both a bare prompt with a long explanatory back and a large reference page testing a trivial detail. If the back grows long, move necessary context to the front, narrow the target, or split the card. Judge balance by relevance and cognitive load, not by matching front and back lengths.
 
