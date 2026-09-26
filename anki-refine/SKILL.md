@@ -17,7 +17,7 @@ Refine Obsidian Markdown h4 blocks that represent Anki notes.
 6. When in doubt, treat the request as review/proposal-only. Never infer writeback permission from the fact that the user supplied exact replacement text.
 7. When applying, replace only the matched h4 block. Do not modify unrelated notes.
 
-When rewriting Anki note content, also follow the `ankify` skill. `anki-refine` controls locating, review, and write-back workflow. `ankify` controls note quality.
+When rewriting note content, use the `ankify` skill for card quality and note format. This skill controls locating, chat review, and scoped write-back.
 
 ## Locating the Note
 
@@ -46,16 +46,8 @@ After finding the target, read the full h4 block: from the matched `#### ` headi
 
 If multiple matches exist, show the candidate file paths/headings and ask the user which one to use. Do not write back unless the source h4 block is uniquely identified.
 
-## Refinement Rules
+## Local Editing Conventions
 
-- First identify the minimum fact the existing note is trying to test. If the current front does not ask that fact clearly, rewrite the front.
-- Keep the back tightly aligned with the front. Delete any back sentence that answers something the front did not ask.
-- Prefer notes that test one minimum fact. If a note covers multiple facts, suggest splitting it.
-- Do not add repeated "one-line summary" sentences after the idea is already stated.
-- Prefer 1-2 short sentences for ordinary backs. Longer process-trace backs are allowed only under the `ankify` process-trace rules.
-- When simplifying, usually shorten the back first. Do not remove front-side context that is needed for precise recall.
-- Use bullets only when they make the answer materially easier to scan, not by default.
-- Use the local term abbreviations if available at `D:\JNote\anki-term-abbreviations.md`.
 - Keep Obsidian wiki image links intact.
 - Follow the user's punctuation rule: use English half-width punctuation in all Chinese text.
 
