@@ -13,19 +13,23 @@ import re
 import shutil
 import sqlite3
 import tempfile
+import unicodedata
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
-from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
+from urllib.parse import parse_qsl, unquote, urlencode, urljoin, urlsplit, urlunsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 import xml.etree.ElementTree as ET
 
 
 DEFAULT_ROOT = Path("D:/newsletters")
-FEEDS_TEMPLATE = """# One RSS or Atom URL per line. Lines beginning with # are ignored.
+FEEDS_TEMPLATE = """# One source URL per line. Lines beginning with # are ignored.
+# Supported: RSS/Atom and Hugging Face Daily Papers pages or API URLs.
 # Add feeds here before running sync. Examples:
 # https://rss.arxiv.org/rss/cs.CL
 # https://huggingface.co/blog/feed.xml
+# https://huggingface.co/papers
 """
+MAX_ISSUE_ITEMS = 20
 ARXIV_ID = re.compile(r"^/(?:abs|pdf|html)/(\d{4}\.\d{4,5})(?:v\d+)?(?:\.pdf)?/?$", re.I)
 TRACKING_KEYS = {"fbclid", "gclid", "mc_cid", "mc_eid"}
 
@@ -45,11 +49,11 @@ def published_at(value: str) -> datetime | None:
     return result.replace(tzinfo=timezone.utc) if result.tzinfo is None else result.astimezone(timezone.utc)
 
 
-def three_year_cutoff(reference: datetime) -> datetime:
+def one_year_cutoff(reference: datetime) -> datetime:
     try:
-        return reference.replace(year=reference.year - 3)
+        return reference.replace(year=reference.year - 1)
     except ValueError:
-        return reference.replace(year=reference.year - 3, day=28)
+        return reference.replace(year=reference.year - 1, day=28)
 
 
 def safe_url(url: str) -> str:
@@ -101,8 +105,10 @@ def local_name(tag: str) -> str:
 
 
 def child_text(node: ET.Element, *names: str) -> str:
-    for child in node:
-        if local_name(child.tag) in names:
+    for name in names:
+        for child in node:
+            if local_name(child.tag) != name:
+                continue
             value = "".join(child.itertext()).strip()
             if value:
                 return html.unescape(value)
@@ -153,24 +159,49 @@ def parse_feed(data: bytes, feed_url: str) -> list[dict[str, str]]:
 
 def is_hf_daily(url: str) -> bool:
     parts = urlsplit(url)
-    return parts.hostname == "huggingface.co" and parts.path == "/api/daily_papers"
+    return parts.hostname in {"huggingface.co", "www.huggingface.co"} and (
+        parts.path.rstrip("/") in {"/api/daily_papers", "/papers"}
+        or re.fullmatch(r"/papers/date/\d{4}-\d{2}-\d{2}/?", parts.path) is not None)
+
+
+class HFDailyPage(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.records = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        props = dict(attrs)
+        if props.get("data-target") == "DailyPapers" and props.get("data-props"):
+            data = json.loads(props["data-props"])
+            if isinstance(data, dict):
+                self.records = data.get("dailyPapers")
 
 
 def parse_hf_daily(data: bytes, feed_url: str) -> list[dict[str, str]]:
-    records = json.loads(data)
+    if data.lstrip().startswith(b"<"):
+        page = HFDailyPage()
+        page.feed(data.decode("utf-8-sig"))
+        records = page.records
+    else:
+        records = json.loads(data)
+        if isinstance(records, dict):
+            records = records.get("dailyPapers", records.get("papers"))
     if not isinstance(records, list):
-        raise ValueError("Unexpected Hugging Face Daily Papers response")
+        raise ValueError(f"Unexpected Hugging Face Daily Papers schema: {feed_url}")
     entries = []
     for record in records:
+        if not isinstance(record, dict) or not isinstance(record.get("paper"), dict):
+            raise ValueError(f"Invalid Hugging Face paper record: {feed_url}")
         paper = record.get("paper", {})
         paper_id = paper.get("id", "")
-        if not re.fullmatch(r"\d{4}\.\d{4,5}", paper_id):
-            continue
+        if not isinstance(paper_id, str) or not re.fullmatch(r"\d{4}\.\d{4,5}", paper_id):
+            raise ValueError(f"Invalid Hugging Face paper ID: {paper_id!r}")
         entries.append({
             "url": f"https://arxiv.org/abs/{paper_id}",
             "title": paper.get("title") or record.get("title") or paper_id,
             "published": paper.get("publishedAt", ""),
             "featured_at": record.get("publishedAt", ""),
+            "summary": paper.get("summary", ""),
             "feed_url": feed_url,
             "pdf_url": "",
         })
@@ -182,8 +213,31 @@ def source_url_for_date(url: str, date: str | None) -> str:
         return url
     parts = urlsplit(url)
     query = dict(parse_qsl(parts.query))
-    query["date"] = date
-    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), ""))
+    if parts.path.rstrip("/") == "/api/daily_papers":
+        query["date"] = date
+        path = parts.path
+    else:
+        query.pop("date", None)
+        path = f"/papers/date/{date}"
+    return urlunsplit((parts.scheme, parts.netloc, path, urlencode(query), ""))
+
+
+def source_entries(url: str, date: str | None) -> list[dict[str, str]]:
+    request_url = source_url_for_date(url, date)
+    data, _, final_url = fetch(request_url, 8 * 1024 * 1024)
+    if is_hf_daily(url) or is_hf_daily(final_url):
+        entries = parse_hf_daily(data, request_url)
+        # A dated API and the public edition page can disagree; check the page
+        # rather than interpreting an empty API response as a verified empty edition.
+        if not entries and date and urlsplit(request_url).path.rstrip("/") == "/api/daily_papers":
+            page_url = f"https://huggingface.co/papers/date/{date}"
+            page, _, _ = fetch(page_url, 8 * 1024 * 1024)
+            entries = parse_hf_daily(page, page_url)
+        return entries
+    try:
+        return parse_feed(data, final_url)
+    except (ET.ParseError, ValueError) as exc:
+        raise ValueError(f"Unsupported or malformed source: {url}. Expected RSS/Atom or a supported Daily Papers URL") from exc
 
 
 class TextExtractor(HTMLParser):
@@ -397,6 +451,80 @@ def read_feeds(root: Path) -> list[str]:
     return [safe_url(line) for line in lines if line.strip() and not line.lstrip().startswith("#")]
 
 
+def heading_fragment(title: str) -> str:
+    # Newsletter headings are plain text; keep Unicode letters, marks, and numbers.
+    return "".join(char for char in title.strip().lower()
+                   if char in " -_" or unicodedata.category(char)[0] in "LMN").replace(" ", "-")
+
+
+def check_issue(db: sqlite3.Connection, root: Path, issue: Path) -> list[str]:
+    issue = issue.resolve()
+    if not issue.is_file() or not issue.is_relative_to((root / "issues").resolve()):
+        raise ValueError("Issue must be an existing Markdown file inside the issues directory")
+    if issue.suffix.lower() != ".md":
+        raise ValueError("Issue must be Markdown")
+    text = issue.read_text(encoding="utf-8-sig")
+    # Ignore fenced examples when inspecting actual headings and citations.
+    text = re.sub(r"(?ms)^ {0,3}(`{3,}|~{3,})[^\n]*\n.*?^ {0,3}\1[ \t]*$", "", text)
+    sections = list(re.finditer(r"(?m)^## [^\n]+$", text))
+    articles = list(re.finditer(r"(?m)^### ([^\n]+)$", text))
+    if len(sections) != 2 or not articles or any(h.start() < sections[1].end() for h in articles):
+        raise ValueError("Expected two H2 sections: theme overview, then H3 individual summaries")
+    if len(articles) > MAX_ISSUE_ITEMS:
+        raise ValueError(f"An issue may contain at most {MAX_ISSUE_ITEMS} articles; found {len(articles)}")
+    if re.search(r"(?m)^#{4,6} ", text):
+        raise ValueError("Do not add lower-level headings inside summaries")
+    fragments = [heading_fragment(re.sub(r"[ \t]+#+[ \t]*$", "", heading.group(1)))
+                 for heading in re.finditer(r"(?m)^#{1,3} ([^\n]+)$", text)]
+    if not all(fragments) or len(set(fragments)) != len(fragments):
+        raise ValueError("Use unique, nonempty plain-text headings for predictable Markdown links")
+    article_fragments = {heading_fragment(re.sub(r"[ \t]+#+[ \t]*$", "", article.group(1)))
+                         for article in articles}
+    links = re.compile(r"\[[^\]\n]+\]\((?:<([^>]+)>|([^\s)]+))\)")
+
+    def targets(value: str) -> list[str]:
+        return [a or b for a, b in links.findall(value)]
+
+    overview = text[sections[0].end():sections[1].start()]
+    citations = {unquote(link[1:]) for link in targets(overview) if link.startswith("#")}
+    if citations != article_fragments:
+        raise ValueError("Overview must cite every summary and only summaries in this issue; expected targets: "
+                         + ", ".join("#" + fragment for fragment in sorted(article_fragments)))
+    all_targets = targets(text)
+    if any(link.startswith("#") and unquote(link[1:]) not in fragments for link in all_targets):
+        raise ValueError("Broken internal article citation")
+    ids = []
+    for index, article in enumerate(articles):
+        end = articles[index + 1].start() if index + 1 < len(articles) else len(text)
+        body = text[article.end():end]
+        if re.search(r"(?m)^ {0,3}>", body):
+            raise ValueError("Write individual summaries as ordinary paragraphs, not blockquotes")
+        if not re.search(r"[\u3400-\u4dbf\u4e00-\u9fff]", links.sub("", body)):
+            raise ValueError("Each individual summary needs Chinese prose; translate non-Chinese abstracts")
+        summary_links = targets(body)
+        local_links = [unquote(urlsplit(link).path) for link in summary_links if link.startswith("../materials/")]
+        local_ids = {match.group(1) for link in local_links
+                     if (match := re.fullmatch(r"\.\./materials/([a-f0-9]{20})/[^/]+", link))}
+        if len(local_ids) != 1:
+            raise ValueError("Each summary needs a local archive link to exactly one material")
+        item_id = local_ids.pop()
+        if item_id in ids:
+            raise ValueError("Duplicate article in issue")
+        row = db.execute("SELECT canonical_url, source_url, archive_dir FROM items WHERE id = ?", (item_id,)).fetchone()
+        if row is None:
+            raise ValueError(f"Unknown material: {item_id}")
+        original = {row["canonical_url"], row["source_url"]}
+        if not any(link in original for link in summary_links):
+            raise ValueError(f"Missing original URL in summary: {item_id}")
+        archive_dir = Path(row["archive_dir"]).resolve()
+        local = [(issue.parent / link).resolve() for link in local_links]
+        if not any(path.parent == archive_dir and path.is_file() and path.suffix.lower() in {".pdf", ".html", ".txt"}
+                   for path in local):
+            raise ValueError(f"Missing or broken local archive link in summary: {item_id}")
+        ids.append(item_id)
+    return ids
+
+
 def emit(value: object) -> None:
     print(json.dumps(value, ensure_ascii=False))
 
@@ -412,6 +540,8 @@ def main() -> int:
     sub.add_parser("processed")
     add = sub.add_parser("add", help="Archive one direct article or paper URL")
     add.add_argument("url")
+    check = sub.add_parser("check", help="Check issue size, heading links, and source links (not factual accuracy)")
+    check.add_argument("issue", type=Path)
     mark = sub.add_parser("mark", help="Mark items covered in a newsletter as used")
     mark.add_argument("decision", choices=("used",))
     mark.add_argument("ids", nargs="+")
@@ -434,14 +564,13 @@ def main() -> int:
             if not feeds:
                 emit({"new": 0, "errors": [], "note": f"Add RSS or Atom URLs to {root / 'feeds.txt'}"})
                 return 0
-            count, downloaded, reused, old, undated, errors = 0, 0, 0, 0, 0, []
+            count, downloaded, reused, old, undated, future, errors = 0, 0, 0, 0, 0, 0, []
             cache = cache_index(root)
-            cutoff = three_year_cutoff(datetime.now(timezone.utc))
+            reference = datetime.now(timezone.utc)
+            cutoff = one_year_cutoff(reference)
             for feed_url in feeds:
                 try:
-                    request_url = source_url_for_date(feed_url, args.date)
-                    data, _, _ = fetch(request_url, 8 * 1024 * 1024)
-                    entries = parse_hf_daily(data, request_url) if is_hf_daily(feed_url) else parse_feed(data, feed_url)
+                    entries = source_entries(feed_url, args.date)
                 except Exception as exc:
                     errors.append(f"{feed_url}: {exc}")
                     continue
@@ -453,6 +582,9 @@ def main() -> int:
                     if published < cutoff:
                         old += 1
                         continue
+                    if published > reference:
+                        future += 1
+                        continue
                     try:
                         saved = archive(db, root, item, cache)
                         if saved:
@@ -463,7 +595,7 @@ def main() -> int:
                     except Exception as exc:
                         errors.append(f"{item['url']}: {exc}")
             emit({"new": count, "downloaded": downloaded, "reused": reused,
-                  "skipped_old": old, "skipped_undated": undated, "errors": errors})
+                  "skipped_old": old, "skipped_undated": undated, "skipped_future": future, "errors": errors})
             return 1 if errors else 0
         elif args.command == "add":
             saved = archive(db, root, {"url": args.url, "title": args.url, "published": "", "feed_url": ""})
@@ -479,12 +611,15 @@ def main() -> int:
                 FROM items WHERE status = 'done' ORDER BY processed_at DESC, id""").fetchall()
             for row in rows:
                 emit(dict(row))
+        elif args.command == "check":
+            emit({"articles": check_issue(db, root, args.issue), "issue": str(args.issue.resolve())})
         elif args.command == "mark":
             if not args.issue:
                 parser.error("--issue is required for used items")
             issue = args.issue.resolve()
-            if not issue.is_file() or not issue.is_relative_to(root):
-                parser.error("--issue must be an existing file inside the data root")
+            ids = check_issue(db, root, issue)
+            if len(set(args.ids)) != len(args.ids) or not set(args.ids).issubset(ids):
+                raise ValueError("Mark only unique article IDs present in this issue")
             with db:
                 for item_id in args.ids:
                     changed = db.execute("""UPDATE items SET status = 'done', decision = ?,

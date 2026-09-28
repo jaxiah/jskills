@@ -2,9 +2,9 @@
 
 ## Source and Scope
 
-This reference reconstructs the method behind Michael Black's *Writing a good scientific paper. The secrets I share with my students.* from the original English article in the user-provided HTML and the primary materials discussed below. It is not a translation of the earlier Chinese reference, a reproduction of the article, or a claim that Black published this exact framework. The organization and explanatory connections are a synthesis; newsletter applications are identified separately.
+This optional reference reconstructs the method behind Michael Black's *Writing a good scientific paper. The secrets I share with my students.* from the original English article in the user-provided HTML and the primary materials discussed below. Use it when writing a scientific paper or a substantial thematic literature review after deeper reading, not as the newsletter's default production instructions. It is not a reproduction of the article or a claim that Black published this exact framework. The organization and explanatory connections are a synthesis; adaptations to literature-review writing are identified separately.
 
-The article is available on [Medium](https://medium.com/@black_51980/writing-a-good-scientific-paper-c0f8af480c91) and through [Black's research institute](https://is.mpg.de/news/writing-a-good-scientific-paper). The saved HTML records a Medium publication date of 2024-11-09. The 2026-09-28 date in the local filename is a capture date, not the article's publication date.
+The original is available on [Medium](https://medium.com/@black_51980/writing-a-good-scientific-paper-c0f8af480c91), whose current page displays November 8, 2024, and through [Black's research institute](https://is.mpg.de/news/writing-a-good-scientific-paper). The November 9 date previously recorded from the saved HTML differs from the displayed date; the 2026-09-28 date in the local filename is a capture date, not publication. This reference was checked against the original again when separating paper-writing guidance from newsletter generation.
 
 Black writes from his experience in computer vision, machine learning, and computer graphics, especially conference communities such as CVPR, ICCV, ECCV, NeurIPS, and SIGGRAPH. His ambition is not simply acceptance: a paper should teach an idea that remains useful to the field. Three kinds of guidance must stay distinct:
 
@@ -12,7 +12,7 @@ Black writes from his experience in computer vision, machine learning, and compu
 - **Personal experience and preferences:** judgments about first impressions, reviewer psychology, tense, naming, visual style, and length. These are not automatically experimentally established laws of writing.
 - **Publication-specific requirements:** page limits, citation conventions, and rules for supplementary material. Check the actual venue rather than universalizing a historical example.
 
-Use this as a substantive reference, not a mandatory production pipeline. Its questions can guide thinking without creating extra plans, evidence forms, notation tables, or review reports for every newsletter.
+Use this as substantive writing guidance, not a mandatory production pipeline. Its questions can guide thinking without requiring extra plans, evidence forms, or status reports. Sections 1-11 recover the scientific-paper advice; section 12 adapts it to a literature review without pretending that synthesis is an original experiment.
 
 ## Reading Map
 
@@ -27,7 +27,7 @@ Use this as a substantive reference, not a mandatory production pipeline. Its qu
 - [9. Make the Prose Say Exactly What Happened](#9-make-the-prose-say-exactly-what-happened)
 - [10. Revise the Argument and Use Collaborators Well](#10-revise-the-argument-and-use-collaborators-well)
 - [11. Finish the Whole Communication Artifact](#11-finish-the-whole-communication-artifact)
-- [12. Apply the Method to This Newsletter](#12-apply-the-method-to-this-newsletter)
+- [12. Adapt the Method to a Thematic Literature Review](#12-adapt-the-method-to-a-thematic-literature-review)
 - [13. Source Coverage and Verification Boundaries](#13-source-coverage-and-verification-boundaries)
 
 ## 1. Writing Is Part of Doing the Research
@@ -85,7 +85,7 @@ Keep the remaining questions together:
 
 The pitch and imagined teaser are diagnostic tools. If neither is possible, the problem may be an unresolved idea rather than inadequate wording. Conversely, a compelling pitch does not demonstrate that the hypothesis is true.
 
-**Newsletter application:** recover these relationships from the source. Do not invent a hypothesis the authors never state, retrofit a clean research history, or reject a blog, dataset release, or tool announcement for not having the structure of a research experiment.
+**Literature-review adaptation:** recover these relationships from the sources. Do not invent hypotheses the authors never state, retrofit a clean research history, or reject useful engineering or measurement work for lacking a conceptual breakthrough.
 
 ## 3. The Nugget Is Not the Technical Contribution
 
@@ -126,7 +126,7 @@ Black describes another recurring form of insight: the field struggles separatel
 
 To communicate such a nugget, explain what the two parts supply to one another: information, constraints, a shared representation, or a different formulation. Combining two difficult tasks is not inherently a simplification. The claim still needs an explanation and evidence.
 
-**Newsletter application:** do not manufacture a nugget for every source. Some contributions are useful engineering, new measurements, infrastructure, or negative results without a stated conceptual reversal. Explain their actual value. A synthesis across papers belongs to the newsletter writer and must not be attributed to an individual paper's authors.
+**Literature-review adaptation:** distinguish a source's insight from your own synthesis. Some sources contribute useful engineering, measurements, infrastructure, or negative results without a conceptual reversal. A review's nugget can be a useful distinction or explanatory framework across such work, but must not be falsely attributed to individual authors.
 
 ## 4. Teach Through Goal, Problem, and Solution
 
@@ -168,7 +168,7 @@ The report's example and Figure 3 caption were checked; its mathematical derivat
 
 Black advises one main story per paper. Two independent major ideas can compete for attention, leaving readers remembering only one. Subparts are appropriate when they contribute to a coherent central explanation.
 
-**Newsletter application:** apply this at the level of a source or a genuinely related group. An issue covering several fields does not need one unifying story. Do not discard unrelated sources to make the narrative tidier.
+**Literature-review adaptation:** choose a bounded question that supports a coherent argument. A review can explain several competing answers within that question; it need not force them into one winning method or imply that they solve identical tasks.
 
 ## 5. Design the Different Entrances to the Paper
 
@@ -223,7 +223,7 @@ Black values short, pronounceable, distinctive acronyms. He calls a good acronym
 
 The underlying method balances semantic association, pronounceability, recoverability, and searchability. A [Scrabble word finder](https://word.tips/scrabble-word-finder/) can assist with combinations; it cannot judge whether a name represents the science. These are naming experiences, not controlled experiments on citation or communication effects.
 
-**Newsletter application:** preserve established names and explain them where helpful. Do not create an acronym, teaser, or publication-style abstract for every report.
+**Literature-review adaptation:** preserve established names and explain them where helpful. Do not rename other authors' work to make your taxonomy look novel.
 
 ## 6. Related Work Should Teach a Way of Thinking
 
@@ -239,9 +239,7 @@ Black also recommends historical investigation. Follow the chain of reasoning ba
 
 His preference for present tense in this section reflects the view that earlier methods remain available intellectual objects. It is an English style preference, not a rule that historical events must be represented as current events.
 
-**Newsletter application:** grouping should explain relationships. Papers may offer competing solutions, complementary components, alternative assumptions, or answers at different levels of a problem. Numerical comparability is not required for a conceptual comparison, but be explicit about what is being compared.
-
-The skill's three-year limit governs incoming materials, not the age of knowledge needed to explain them. Historical sources can be checked as background. They do not become new items, restore a deleted processing history, or change the source-selected coverage of the current issue.
+**Literature-review adaptation:** grouping should explain relationships. Papers may offer competing solutions, complementary components, alternative assumptions, or answers at different levels of a problem. Numerical comparability is not required for a conceptual comparison, but be explicit about what is being compared. A newsletter's source list and date window are not the literature boundary of a later paper; follow important predecessors as far back as the question requires.
 
 ## 7. Experiments Should Explain What Matters
 
@@ -263,7 +261,7 @@ Black strongly advocates changing one thing at a time. Changing both method and 
 
 Black's aim for comparison is learning and teaching. Explain what different methods reveal, not just which one wins. His rejection of promotional language about results follows from this: experiments test a hypothesis rather than sell a product.
 
-**Newsletter application:** ask whether comparisons share relevant data, training or tuning budgets, inputs, tasks, metrics, and runtime conditions. Identify what is controlled, what is confounded, and which conclusions the differences permit. These checks apply Black's fairness principle to reporting; they are not a list of measurements he requires every paper to include.
+**Literature-review adaptation:** ask whether comparisons share relevant data, training or tuning budgets, inputs, tasks, metrics, and runtime conditions. Identify what is controlled, what is confounded, and which conclusions the differences permit. These checks apply Black's fairness principle to synthesis; they are not a list of measurements he requires every paper to include.
 
 A demonstration can make an idea intuitive. A benchmark can measure performance under a particular protocol. An ablation can isolate a factor under its tested conditions. None should silently substitute for the others.
 
@@ -297,7 +295,7 @@ This is one of Black's strongest technical warnings. If the final implementation
 
 Writing equations early gives the team a chance to detect the discrepancy and change the code while new experiments are still possible. Once the experiments are complete, faithfully describing the actual implementation is essential. Improving the stated algorithm without obtaining evidence for that algorithm breaks the connection between method and results.
 
-**Newsletter application:** distinguish a method described by authors from a code-to-equation comparison performed by the writer. Reading the paper alone does not establish that the implementation was independently verified.
+**Literature-review adaptation:** distinguish a method described by authors from a code-to-equation comparison you actually performed. Reading the paper alone does not establish that its implementation was independently verified.
 
 ### Notation Should Reduce Work for the Reader
 
@@ -305,7 +303,7 @@ Choose distinguishable representations for scalars, vectors, matrices, indices, 
 
 Black suggests maintaining a notation table from the beginning and adding each symbol as it appears. The table exposes inconsistencies before they spread. His bold, italic, and Greek-letter examples are possible conventions, not a universal notation standard; the article's illustrative `\Alpha` should not be copied as though it were a predefined LaTeX command.
 
-For a newsletter, consistent terms and an explanation on first use may be sufficient. There is no requirement to publish a notation appendix for every item.
+In a review, normalize terminology only after checking equivalence. Different symbols can denote the same object, but superficially similar names can conceal different assumptions. A notation table is useful only when it reduces that ambiguity.
 
 ### Figures Form a Paper Within the Paper
 
@@ -317,7 +315,7 @@ For each figure, check what the reader should look at, what they should learn, w
 
 Black attributes some of Sintel's popularity to its attractive imagery. That is his interpretation of a case, not verified evidence that visual beauty caused the dataset's adoption.
 
-**Newsletter application:** use a figure or equation when it materially aids understanding. Do not turn the three-representation recommendation into a requirement to attach both to every short item. Equally, do not remove an essential relationship merely to shorten the prose.
+**Literature-review adaptation:** use comparison diagrams, equations, or tables when they clarify an actual relationship. Do not require all three for every source, and do not omit assumptions merely to make a common diagram look simpler.
 
 ## 9. Make the Prose Say Exactly What Happened
 
@@ -360,13 +358,13 @@ Comparatives need reference points. More accurate than what? More robust under w
 
 Black's English-paper preferences include avoiding contractions and exclamation marks, expanding abbreviations on first use, hyphenating compound adjectives appropriately, keeping heading capitalization consistent, and not italicizing `et al.` or `e.g.`. Citation spacing should be deliberate rather than omitted or doubled.
 
-He prefers present tense for methods and continuing knowledge, including related work, while acknowledging that data collection and human participation often require past tense. Preserve the distinction between ongoing descriptions and events that happened. These English preferences do not imply that the Chinese newsletter needs an artificial tense scheme.
+He prefers present tense for methods and continuing knowledge, including related work, while acknowledging that data collection and human participation often require past tense. Preserve the distinction between ongoing descriptions and events that happened. These are English writing preferences, not a tense scheme to impose on other languages.
 
 ### Do Not Confuse Fluent Model Output with Understanding
 
 Black permits model assistance with grammar but warns against handing over the writing. His concern is that fluent sentences can be verbose, imprecise, and empty of the insight the researcher actually has. His objections to terms such as "showcase" also reflect a substantive stance: results evaluate a hypothesis; they are not product advertising.
 
-This newsletter deliberately uses agents, so it cannot honestly claim to follow a prohibition on model-authored prose. The applicable constraint is that the agent must reconstruct the source's reasoning and preserve its evidential limits. Human judgment remains final. Fluency, vocabulary policing, or a high style score cannot replace that work.
+An agent-assisted paper cannot honestly claim to follow Black's prohibition on model-authored prose. The transferable concern is authorship of the reasoning: the writer must understand the sources, make and defend the argument, and preserve evidential limits. Human judgment remains final. Fluency, vocabulary policing, or a high style score cannot replace that work.
 
 ## 10. Revise the Argument and Use Collaborators Well
 
@@ -418,7 +416,7 @@ Black insists on repeated proofreading by multiple people, including every word 
 
 Read as though the acronyms, mathematics, and literature were unfamiliar. The writer's knowledge otherwise fills gaps that remain real gaps for everyone else. Ask what the document itself makes understandable, not what the author can explain after being challenged.
 
-For the newsletter, a focused comprehension pass and a separate return to the sources preserve this distinction without requiring a formal scorecard or an additional agent.
+For a review, separately check whether a first-time reader can recover the argument and whether the sources support it. Neither check requires a formal scorecard or an additional agent.
 
 ### References Are Part of the Reader's Ability to Check
 
@@ -428,7 +426,7 @@ Sort numerical citations; `\usepackage[numbers,sort,compress]{natbib}` is his au
 
 Do not make a bare citation number the subject of a sentence. Explain which work or idea the citation supports. Black also notes that references may influence reviewer matching. Retain the substantive point, appropriate treatment of prior work, without turning that observation into advice to manipulate assignment.
 
-**Newsletter application:** link both the definitive version and an accessible author version where useful. Do not remove an arXiv or local archive link merely because a formally published version exists. A source must remain usable by the reader.
+**Literature-review adaptation:** cite the definitive version and provide an accessible author version where useful. A reader needs to be able to find and check the actual source, not merely recognize a title.
 
 ### Layout Should Serve Readability
 
@@ -446,7 +444,7 @@ Black's LaTeX advice addresses a constrained, often two-column publication forma
 
 These are tools for making a complete argument fit legibly. They are not a reason to remove essential evidence or evade a venue's formatting rules.
 
-Black also recommends filling the available eight pages, based on his reading of reviewer impressions. Treat this as conference-specific experience, not a general minimum length, a reason to add filler, or a requirement for newsletter output. No PDF or LaTeX publishing stage is introduced by this reference.
+Black also recommends filling the available eight pages, based on his reading of reviewer impressions. Treat this as conference-specific experience, not a general minimum length or a reason to add filler. Choose the length and presentation appropriate to the actual paper and venue.
 
 ### Supplementary Material Must Keep Its Promises
 
@@ -462,58 +460,47 @@ Black recommends planning early, writing a narration script, recording sentences
 
 He praises the [mip-NeRF video](https://jonbarron.info/mipnerf/) for teaching the idea through motion rather than reproducing the paper's structure, particularly around 5:42 and 6:11. Those timestamp judgments come from Black; the project page and its dynamic explanation were checked, but the video segments were not independently reviewed. His praised example also exceeds his proposed length, showing that the intended purpose matters more than literal obedience to the heuristic.
 
-**Newsletter application:** preserve the explanatory benefit of a demonstration when relevant, but do not require a video, teaser, supplement, or typeset layout for each source.
+**Literature-review adaptation:** use a demonstration to explain a mechanism when it helps. Do not treat an illustrative video as evidence of general performance or require every source to have one.
 
-## 12. Apply the Method to This Newsletter
+## 12. Adapt the Method to a Thematic Literature Review
 
-This section is a project-specific application, not an additional section of Black's article.
+This is an adaptation for a later review or short synthesis paper, not an additional section of Black's article. Black primarily addresses authors reporting their own research. A review instead contributes an accountable way of understanding existing evidence; it must not pretend to introduce the methods or run the experiments it describes.
 
-### Recover an Explanation, Not a Better-Sounding Abstract
+### Move from a Reading Collection to an Intellectual Question
 
-For a research source, the writer should be able to explain the connected relationships:
+A collection of newsletter summaries is a starting point, not a finished review. Choose a bounded question that matters to an identifiable reader: which obstacle prevents progress, which assumptions separate approaches, or which unresolved disagreement deserves explanation? Define what the review covers and why. Do not call a source-bounded reading collection a comprehensive or systematic review without the search and inclusion methods to justify that label.
 
-- What outcome matters, and what actually obstructs it?
-- What changes in the authors' understanding or formulation?
-- How does that change lead to the technical design?
-- Which evidence supports the result, and which evidence supports the proposed explanation?
-- What should a reader now believe, consider, or investigate, and what remains unestablished?
+Read the central papers beyond their abstracts before making strong claims about mechanisms, novelty, limitations, or conflicts. Follow their predecessors and inspect decisive evidence. A first-pass newsletter can help locate these papers, but its summaries are not a substitute for that reading.
 
-The final prose need not expose these questions as headings. A fixed four-sentence template can hide a missing mechanism just as easily as an abstract can. Write enough to make the important relationships understandable.
+### Find the Review's Nugget Without Inventing a Breakthrough
 
-For a blog or announcement, examine the stated reasons, examples, observations, and argument. Do not fabricate experimental evidence or turn a practitioner's experience into a universal finding.
+Keep three layers distinct:
 
-### Full Coverage and Coherent Organization Are Compatible
+- **Source contributions:** what each author argues, builds, observes, or demonstrates.
+- **Your synthesis:** a distinction, taxonomy, relationship, or explanation across sources that helps the reader understand the question.
+- **Your implications:** what that explanation suggests for future research or practice, conditional on its evidence and assumptions.
 
-The configured sources determine the incoming materials. The processing state determines which have already been completed. The local material archive is a download cache, not an alternative source-selection policy.
+The review's contribution might be showing that apparently competing methods solve different bottlenecks, that a common metric misses an important property, or that conflicting findings depend on different operating conditions. None of these requires declaring a winner or claiming an original experimental result. A taxonomy earns its place when it explains a consequential difference, not merely when every paper fits a box.
 
-Every eligible, source-selected pending item must receive substantive treatment, or a clearly identified access gap if its original cannot be verified. Interest, popularity, institutional prestige, and narrative convenience are not grounds for exclusion. Different length is acceptable; silently dropping an item or reducing it to a bare title and link is not.
+### Build Paragraphs Around Questions and Relationships
 
-Organize by domain and then by an actual problem where useful. Show relationships among papers only when supported. An unrelated item can have its own section. Black's one-main-story advice applies within a source or a coherent group, not as a demand to force the entire issue into one theme.
+Apply Goal, Problem, and Solution as a teaching order: establish the reader's question, expose the relevant obstacle, and explain how the literature addresses or reframes it. Do not cast every predecessor as a failed attempt on the way to a single inevitable solution.
 
-Necessary historical context can clarify the current materials without changing this coverage. Mark it as background and do not treat it as a new feed item.
+Each thematic paragraph should advance one point. Use sources to establish a shared assumption, contrast approaches, explain a mechanism, or qualify a claim. Several independent abstract summaries do not become an argument through transitions alone. If the connection is weak, change the grouping or narrow the claim. Support source-specific statements and comparisons with citations near the relevant sentence.
 
-### Keep Three Kinds of Insight Distinct
+An illustrative progression is: define what must be retained in an agent's memory, contrast when competing systems compress it, explain which downstream needs that choice serves, and identify what the available evaluations cannot decide. This is an example of an explanatory relationship, not a required paragraph template or a claim about particular papers.
 
-- **The authors' insight:** supported by and attributed to the original source.
-- **The newsletter's synthesis:** a relationship inferred across sources, with its basis made clear.
-- **The newsletter's interpretation of implications:** an explicitly conditional analysis, not a demonstrated result.
+### Make the Evidence Bear the Weight of the Argument
 
-An insightful article does not acquire depth by adding a final sentence saying the work is important. Depth comes from explaining a consequential relationship: why an assumption limits a method, why a representation changes the problem, why a comparison supports only a local conclusion, or why two approaches complement one another.
+Check which tasks, data, models, budgets, metrics, and operating conditions make comparisons meaningful. Distinguish author-reported results, observations you independently checked, and experiments you actually reproduced. Incompatible scores can motivate a discussion of evaluation boundaries; they cannot support a synthetic leaderboard.
 
-Such explanation remains accountable to the sources. When the relationship is absent or uncertain, say so rather than manufacturing a conceptual breakthrough.
+Preserve mixed results and uncertainty. A plausible explanation for a gain is not an isolated causal mechanism. A blog's practical example is not a controlled study. Where evidence does not resolve a disagreement, explaining what would distinguish the alternatives is more useful than declaring consensus.
 
-### Improve Understanding Without Losing Faithfulness
+Use a comparison table, figure, or equation when it makes the distinction easier to inspect. Include the assumptions that make the representation valid. Finish with the bounded understanding the reader has gained and the genuinely open questions, not a restatement of every abstract.
 
-Use [writing-guide.md](writing-guide.md) for the concise reporting constraints and empirical qualifications. Its principles operate at different levels:
+### Revise Understanding and Fidelity Separately
 
-- Goal, Problem, and Solution explain why a response is needed.
-- The nugget distinguishes the underlying insight from the implemented contribution.
-- Given-to-new organization helps readers track a sentence or paragraph.
-- Evidence checking constrains what the resulting explanation can claim.
-
-Do not collapse these into a universal template. Remove jargon density, filler, and unnecessary syntactic burden, not the logic the reader needs. A text that feels clear can still be misleading or poorly understood.
-
-The reference documents are in English; the newsletter remains in simplified Chinese with English halfwidth punctuation. Continue to produce Markdown with original web links and usable local archive links. This method does not add scheduling, email delivery, a rendering stage, or mandatory intermediate artifacts.
+On a reader pass, ask whether the problem, organizing insight, relationships, and remaining uncertainties can be recovered from the draft alone. On a source pass, return to the originals to check that those claims are supported and appropriately attributed. Clear prose and faithful claims are different requirements. This guidance does not impose a fixed paper outline, a saved evidence ledger, or publication requirements on ordinary newsletter generation.
 
 ## 13. Source Coverage and Verification Boundaries
 
@@ -546,4 +533,4 @@ The reference documents are in English; the newsletter remains in simplified Chi
 | [mip-NeRF project](https://jonbarron.info/mipnerf/) | Project page and dynamic conceptual explanation checked; timestamp-specific video assessments remain Black's |
 | [NIST, One variable at a time](https://www.itl.nist.gov/div898/handbook/pri/section2/pri212.htm) | Additional source, not a link in Black's article; used only to qualify claims about single-factor experiments and interactions |
 
-Author and adviser homepages, the Scrabble helper, and Sintel serve biographical, naming, or illustrative roles in the article. They were not treated as independent evidence that a writing intervention improves comprehension. The broader science-communication studies and their limits are documented in [writing-guide.md](writing-guide.md).
+Author and adviser homepages, the Scrabble helper, and Sintel serve biographical, naming, or illustrative roles in the article. They were not treated as independent evidence that a writing intervention improves comprehension. The original remains linked for checking Black's wording; this reference deliberately separates his practitioner advice from our review-writing adaptation rather than reproducing the article verbatim.

@@ -1,4 +1,5 @@
 import contextlib
+import html
 from datetime import datetime, timedelta, timezone
 from email.utils import format_datetime
 import importlib.util
@@ -27,6 +28,28 @@ class ArchiveTests(unittest.TestCase):
     def tearDown(self):
         self.db.close()
         self.temp.cleanup()
+
+    def issue(self, saved_items, name="newsletter.md"):
+        overview = "Related work " + " ".join(f"[{i}](#{i}-article)" for i, item in enumerate(saved_items, 1))
+        summaries = []
+        for i, item in enumerate(saved_items, 1):
+            summaries.append(f'''### {i}. Article
+
+\u6587\u7ae0\u8bf4\u660e\u4e86\u95ee\u9898\u548c\u65b9\u6cd5. A self-contained description of the problem and the reported method.
+
+[Original]({item['url']}) [Archive](../materials/{item['id']}/source.html)
+''')
+        issue = self.root / "issues" / name
+        issue.write_text("# Newsletter\n\n## Theme Overview\n\n" + overview + "\n\n## Individual Summaries\n\n"
+                         + "\n".join(summaries), encoding="utf-8")
+        return issue
+
+    def articles(self, count):
+        def fetch(url, limit):
+            return b"<html><body>Article</body></html>", "text/html", url
+        with mock.patch.object(archive, "fetch", side_effect=fetch):
+            return [archive.archive(self.db, self.root, {"url": f"https://example.org/{i}", "title": f"Article {i}"})
+                    for i in range(count)]
 
     def test_rss_and_atom_duplicate_is_archived_once(self):
         rss = b"""<rss><channel><item><title>Example</title>
@@ -76,14 +99,15 @@ class ArchiveTests(unittest.TestCase):
             self.assertIsNone(archive.archive(self.db, self.root, item))
             fetch.assert_called_once()
 
-    def test_sync_only_archives_unseen_items_within_three_years(self):
+    def test_sync_only_archives_unseen_items_within_one_year(self):
         feed_url = "https://example.org/feed"
-        cutoff = archive.three_year_cutoff(datetime.now(timezone.utc))
+        cutoff = archive.one_year_cutoff(datetime.now(timezone.utc))
         recent = format_datetime(datetime.now(timezone.utc))
         old = format_datetime(cutoff - timedelta(days=1))
         feed = f"""<rss><channel>
             <item><title>Recent</title><link>https://example.org/recent</link><pubDate>{recent}</pubDate></item>
             <item><title>Old</title><link>https://example.org/old</link><pubDate>{old}</pubDate></item>
+            <item><title>Future</title><link>https://example.org/future</link><pubDate>{format_datetime(datetime.now(timezone.utc) + timedelta(days=1))}</pubDate></item>
             <item><title>Undated</title><link>https://example.org/undated</link></item>
             </channel></rss>""".encode()
         (self.root / "feeds.txt").write_text(feed_url + "\n", encoding="utf-8")
@@ -104,9 +128,24 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(requests.count("https://example.org/recent"), 1)
         self.assertNotIn("https://example.org/old", requests)
         self.assertNotIn("https://example.org/undated", requests)
+        self.assertNotIn("https://example.org/future", requests)
         self.assertEqual(self.db.execute("SELECT count(*) FROM items").fetchone()[0], 1)
         self.assertIn('"skipped_old": 1', output.getvalue())
         self.assertIn('"skipped_undated": 1', output.getvalue())
+        self.assertIn('"skipped_future": 1', output.getvalue())
+
+    def test_one_year_cutoff_handles_leap_day(self):
+        reference = datetime(2024, 2, 29, 12, 30, tzinfo=timezone.utc)
+        self.assertEqual(archive.one_year_cutoff(reference), datetime(2023, 2, 28, 12, 30, tzinfo=timezone.utc))
+        self.assertEqual(archive.one_year_cutoff(datetime(2026, 9, 28, tzinfo=timezone.utc)),
+                         datetime(2025, 9, 28, tzinfo=timezone.utc))
+
+    def test_atom_prefers_original_published_date_over_updated(self):
+        data = b'''<feed xmlns="http://www.w3.org/2005/Atom"><entry>
+            <title>A</title><link href="https://example.org/a"/>
+            <updated>2026-09-28T00:00:00Z</updated><published>2024-09-28T00:00:00Z</published>
+            </entry></feed>'''
+        self.assertEqual(archive.parse_feed(data, "https://example.org/feed")[0]["published"], "2024-09-28T00:00:00Z")
 
     def test_feed_pdf_enclosure_is_preserved(self):
         feed = b"""<rss><channel><item><title>Paper</title>
@@ -137,12 +176,193 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(archive.source_url_for_date(source, "2026-09-25"),
                          source + "&date=2026-09-25")
 
+    def test_hf_daily_pages_and_json_wrappers_preserve_metadata(self):
+        records = [{"publishedAt": "2026-09-25T00:00:00Z", "paper": {
+            "id": "2609.28654", "title": 'A "quoted" title & evidence',
+            "publishedAt": "2026-09-23T00:00:00Z", "summary": "Author abstract"}}]
+        expected = archive.parse_hf_daily(json.dumps(records).encode(), "https://huggingface.co/papers")
+        props = html.escape(json.dumps({"dailyPapers": records}), quote=True)
+        page = f'<html><div data-target="DailyPapers" data-props="{props}"></div></html>'.encode()
+        self.assertEqual(archive.parse_hf_daily(page, "https://huggingface.co/papers"), expected)
+        self.assertEqual(expected[0]["summary"], "Author abstract")
+        for wrapper in ("papers", "dailyPapers"):
+            self.assertEqual(archive.parse_hf_daily(json.dumps({wrapper: records}).encode(), "https://huggingface.co/papers"), expected)
+        for url in ("https://huggingface.co/papers", "https://huggingface.co/papers/",
+                    "https://huggingface.co/papers/date/2026-09-25", "https://huggingface.co/api/daily_papers/"):
+            self.assertTrue(archive.is_hf_daily(url))
+        self.assertFalse(archive.is_hf_daily("https://huggingface.co/papers/2609.28654"))
+        self.assertFalse(archive.is_hf_daily("https://example.org/papers"))
+        self.assertEqual(archive.source_url_for_date("https://huggingface.co/papers?sort=trending", "2026-09-25"),
+                         "https://huggingface.co/papers/date/2026-09-25?sort=trending")
+
+    def test_empty_dated_api_checks_the_public_edition(self):
+        source = "https://huggingface.co/api/daily_papers?limit=100"
+        props = html.escape(json.dumps({"dailyPapers": [{"paper": {
+            "id": "2609.28654", "title": "A", "publishedAt": "2026-09-23T00:00:00Z"}}]}), quote=True)
+        page = f'<div data-target="DailyPapers" data-props="{props}"></div>'.encode()
+        with mock.patch.object(archive, "fetch", side_effect=[(b"[]", "application/json", source),
+                                                             (page, "text/html", "https://huggingface.co/papers/date/2026-09-25")]) as fetch:
+            entries = archive.source_entries(source, "2026-09-25")
+        self.assertEqual(entries[0]["url"], "https://arxiv.org/abs/2609.28654")
+        self.assertEqual(fetch.call_args_list[-1], mock.call("https://huggingface.co/papers/date/2026-09-25", 8 * 1024 * 1024))
+
+    def test_source_schema_changes_are_errors_not_empty_feeds(self):
+        for data in (b"{}", b"[null]", b'[{"paper": {"id": "not-an-id"}}]', b"<html>Changed layout</html>"):
+            with self.subTest(data=data), self.assertRaises(ValueError):
+                archive.parse_hf_daily(data, "https://huggingface.co/papers")
+        with mock.patch.object(archive, "fetch", return_value=(b"<html>Blog index</html>", "text/html", "https://example.org/index")):
+            with self.assertRaisesRegex(ValueError, "Unsupported or malformed source"):
+                archive.source_entries("https://example.org/index", None)
+
+    def test_sync_handles_mixed_rss_and_hf_page_sources(self):
+        rss_url = "https://example.org/feed"
+        hf_url = "https://huggingface.co/papers"
+        published = datetime.now(timezone.utc).isoformat()
+        rss = f'<rss><channel><item><title>Blog</title><link>https://example.org/blog</link><pubDate>{published}</pubDate></item></channel></rss>'.encode()
+        props = html.escape(json.dumps({"dailyPapers": [{"paper": {
+            "id": "2609.28654", "title": "Paper", "publishedAt": published}}]}), quote=True)
+        hf = f'<div data-target="DailyPapers" data-props="{props}"></div>'.encode()
+        (self.root / "feeds.txt").write_text(rss_url + "\n" + hf_url + "\n", encoding="utf-8")
+
+        def fetch(url, limit):
+            if url == rss_url:
+                return rss, "application/rss+xml", url
+            if url == hf_url:
+                return hf, "text/html", url
+            if "/pdf/" in url:
+                return b"%PDF-1.7\noriginal", "application/pdf", url
+            return b"<html><body>Original</body></html>", "text/html", url
+
+        with mock.patch.object(archive, "fetch", side_effect=fetch), contextlib.redirect_stdout(io.StringIO()):
+            with mock.patch.object(sys, "argv", ["archive.py", "--root", str(self.root), "sync"]):
+                self.assertEqual(archive.main(), 0)
+        self.assertEqual(self.db.execute("SELECT count(*) FROM current_items").fetchone()[0], 2)
+
+    def test_issue_check_accepts_20_articles_and_rejects_21(self):
+        items = self.articles(21)
+        self.assertEqual(archive.check_issue(self.db, self.root, self.issue(items[:20])), [item["id"] for item in items[:20]])
+        with self.assertRaisesRegex(ValueError, "at most 20"):
+            archive.check_issue(self.db, self.root, self.issue(items))
+
+    def test_issue_check_rejects_duplicate_articles_and_missing_citations(self):
+        items = self.articles(2)
+        with self.assertRaisesRegex(ValueError, "Duplicate"):
+            archive.check_issue(self.db, self.root, self.issue([items[0], items[0]]))
+        issue = self.issue(items)
+        issue.write_text(issue.read_text(encoding="utf-8").replace("[2](#2-article)", ""), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "cite every summary"):
+            archive.check_issue(self.db, self.root, issue)
+
+    def test_issue_check_rejects_broken_original_and_local_links(self):
+        items = self.articles(1)
+        for old, new, error in ((items[0]["url"], "https://example.org/wrong", "original URL"),
+                                ("source.html", "missing.html", "local archive link"),
+                                (items[0]["id"], "0" * 20, "Unknown material")):
+            issue = self.issue(items)
+            issue.write_text(issue.read_text(encoding="utf-8").replace(old, new), encoding="utf-8")
+            with self.subTest(error=error), self.assertRaisesRegex(ValueError, error):
+                archive.check_issue(self.db, self.root, issue)
+
+    def test_heading_fragments_keep_chinese_and_remove_punctuation(self):
+        for title, fragment in (("1. BudgetKV: KV Cache", "1-budgetkv-kv-cache"),
+                                ("2. KV Cache: \u4fdd\u7559\u7b56\u7565", "2-kv-cache-\u4fdd\u7559\u7b56\u7565"),
+                                ("3. Long-context / model_v2", "3-long-context--model_v2"),
+                                ("4. Cafe\u0301", "4-cafe\u0301")):
+            with self.subTest(title=title):
+                self.assertEqual(archive.heading_fragment(title), fragment)
+
+    def test_issue_check_accepts_heading_links_without_html_anchors(self):
+        items = self.articles(1)
+        issue = self.issue(items)
+        text = issue.read_text(encoding="utf-8").replace("1. Article", "1. KV Cache: \u4fdd\u7559\u7b56\u7565")
+        text = text.replace("#1-article", "#1-kv-cache-%E4%BF%9D%E7%95%99%E7%AD%96%E7%95%A5")
+        issue.write_text(text, encoding="utf-8")
+        self.assertNotIn("<a ", text)
+        self.assertEqual(archive.check_issue(self.db, self.root, issue), [items[0]["id"]])
+
+    def test_issue_check_rejects_changed_or_duplicate_heading_targets(self):
+        items = self.articles(2)
+        for old, new, error in (("1. Article", "1. Renamed article", "expected targets"),
+                                ("2. Article", "1. Article!", "unique"),
+                                ("reported method.", "reported method. [Related](#missing)", "Broken internal")):
+            issue = self.issue(items)
+            issue.write_text(issue.read_text(encoding="utf-8").replace(old, new), encoding="utf-8")
+            with self.subTest(error=error), self.assertRaisesRegex(ValueError, error):
+                archive.check_issue(self.db, self.root, issue)
+
+    def test_issue_check_identifies_material_from_local_link_not_other_source_links(self):
+        items = self.articles(2)
+        issue = self.issue(items[:1])
+        text = issue.read_text(encoding="utf-8") + f"\n[Related paper]({items[1]['url']})\n"
+        issue.write_text(text, encoding="utf-8")
+        self.assertEqual(archive.check_issue(self.db, self.root, issue), [items[0]["id"]])
+        issue.write_text(text + f"[Other archive](../materials/{items[1]['id']}/source.html)\n", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "exactly one material"):
+            archive.check_issue(self.db, self.root, issue)
+
+    def test_issue_check_accepts_translated_author_abstract_as_plain_paragraphs(self):
+        items = self.articles(1)
+        issue = self.issue(items)
+        original = "A self-contained description of the problem and the reported method."
+        abstract = "\u6211\u4eec\u63d0\u51fa\u4e00\u79cd\u65b9\u6cd5.\n\n\u541e\u5410\u91cf\u63d0\u9ad8\u5230 1.8 \u500d."
+        issue.write_text(issue.read_text(encoding="utf-8").replace(original, abstract), encoding="utf-8")
+        self.assertEqual(archive.check_issue(self.db, self.root, issue), [items[0]["id"]])
+
+    def test_issue_check_rejects_quoted_or_untranslated_summaries(self):
+        items = self.articles(1)
+        original = "\u6587\u7ae0\u8bf4\u660e\u4e86\u95ee\u9898\u548c\u65b9\u6cd5. A self-contained description of the problem and the reported method."
+        for body, error in (("> \u4f5c\u8005\u6458\u8981\u7684\u4e2d\u6587\u8bd1\u6587.", "not blockquotes"),
+                            ("We propose a method. It achieves 1.8x throughput.", "Chinese prose"),
+                            ("[\u539f\u59cb\u8bba\u6587](https://example.org/0)", "Chinese prose")):
+            issue = self.issue(items)
+            issue.write_text(issue.read_text(encoding="utf-8").replace(original, body), encoding="utf-8")
+            with self.subTest(body=body), self.assertRaisesRegex(ValueError, error):
+                archive.check_issue(self.db, self.root, issue)
+
+    def test_issue_check_ignores_fenced_examples(self):
+        issue = self.issue(self.articles(1))
+        with issue.open("a", encoding="utf-8") as handle:
+            handle.write("\n```markdown\n## Example\n### Not an article\n```\n")
+        self.assertEqual(len(archive.check_issue(self.db, self.root, issue)), 1)
+
+    def test_mark_is_per_issue_and_rejects_other_materials(self):
+        items = self.articles(21)
+        issue = self.issue(items[:20], "part-01.md")
+        argv = ["archive.py", "--root", str(self.root), "mark", "used", items[20]["id"], "--issue", str(issue)]
+        with mock.patch.object(sys, "argv", argv), self.assertRaisesRegex(ValueError, "present"):
+            archive.main()
+        self.assertEqual(self.db.execute("SELECT count(*) FROM items WHERE status = 'done'").fetchone()[0], 0)
+        for part, selected in ((issue, items[:20]), (self.issue(items[20:], "part-02.md"), items[20:])):
+            argv = ["archive.py", "--root", str(self.root), "mark", "used", *[item["id"] for item in selected], "--issue", str(part)]
+            with mock.patch.object(sys, "argv", argv), contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(archive.main(), 0)
+        counts = self.db.execute("SELECT issue_path, count(*) FROM items GROUP BY issue_path").fetchall()
+        self.assertEqual(sorted(row[1] for row in counts), [1, 20])
+
+    def test_issue_check_cli_reports_article_ids_without_marking(self):
+        items = self.articles(2)
+        issue = self.issue(items)
+        output = io.StringIO()
+        argv = ["archive.py", "--root", str(self.root), "check", str(issue)]
+        with mock.patch.object(sys, "argv", argv), contextlib.redirect_stdout(output):
+            self.assertEqual(archive.main(), 0)
+        self.assertEqual(json.loads(output.getvalue())["articles"], [item["id"] for item in items])
+        self.assertEqual(self.db.execute("SELECT count(*) FROM items WHERE status = 'done'").fetchone()[0], 0)
+
+    def test_unverified_material_can_remain_pending_in_saved_issue(self):
+        items = self.articles(2)
+        issue = self.issue(items)
+        argv = ["archive.py", "--root", str(self.root), "mark", "used", items[0]["id"], "--issue", str(issue)]
+        with mock.patch.object(sys, "argv", argv), contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(archive.main(), 0)
+        row = self.db.execute("SELECT status FROM items WHERE id = ?", (items[1]["id"],)).fetchone()
+        self.assertEqual(row["status"], "pending")
+
     def test_mark_requires_issue_and_clears_pending(self):
         page = b"<html><body>Article</body></html>"
         with mock.patch.object(archive, "fetch", return_value=(page, "text/html", "https://example.org/a")):
             saved = archive.archive(self.db, self.root, {"url": "https://example.org/a", "title": "A"})
-        issue = self.root / "issues" / "newsletter-20260927-1200.md"
-        issue.write_text("# Newsletter", encoding="utf-8")
+        issue = self.issue([saved])
         argv = ["archive.py", "--root", str(self.root), "mark", "used", saved["id"], "--issue", str(issue)]
         with mock.patch.object(sys, "argv", argv), contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(archive.main(), 0)
