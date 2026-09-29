@@ -23,11 +23,12 @@ import xml.etree.ElementTree as ET
 
 DEFAULT_ROOT = Path("D:/newsletters")
 FEEDS_TEMPLATE = """# One source URL per line. Lines beginning with # are ignored.
-# Supported: RSS/Atom and Hugging Face Daily Papers pages or API URLs.
+# Supported: RSS/Atom and explicitly supported APIs (currently Hugging Face Daily Papers).
+# Ordinary webpages require agent-led handling, not a site-specific parser here.
 # Add feeds here before running sync. Examples:
 # https://rss.arxiv.org/rss/cs.CL
 # https://huggingface.co/blog/feed.xml
-# https://huggingface.co/papers
+# https://huggingface.co/api/daily_papers?limit=100
 """
 MAX_ISSUE_ITEMS = 20
 ARXIV_ID = re.compile(r"^/(?:abs|pdf|html)/(\d{4}\.\d{4,5})(?:v\d+)?(?:\.pdf)?/?$", re.I)
@@ -159,33 +160,17 @@ def parse_feed(data: bytes, feed_url: str) -> list[dict[str, str]]:
 
 def is_hf_daily(url: str) -> bool:
     parts = urlsplit(url)
-    return parts.hostname in {"huggingface.co", "www.huggingface.co"} and (
-        parts.path.rstrip("/") in {"/api/daily_papers", "/papers"}
-        or re.fullmatch(r"/papers/date/\d{4}-\d{2}-\d{2}/?", parts.path) is not None)
-
-
-class HFDailyPage(HTMLParser):
-    def __init__(self) -> None:
-        super().__init__(convert_charrefs=True)
-        self.records = None
-
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        props = dict(attrs)
-        if props.get("data-target") == "DailyPapers" and props.get("data-props"):
-            data = json.loads(props["data-props"])
-            if isinstance(data, dict):
-                self.records = data.get("dailyPapers")
+    return (parts.hostname in {"huggingface.co", "www.huggingface.co"}
+            and parts.path.rstrip("/") == "/api/daily_papers")
 
 
 def parse_hf_daily(data: bytes, feed_url: str) -> list[dict[str, str]]:
-    if data.lstrip().startswith(b"<"):
-        page = HFDailyPage()
-        page.feed(data.decode("utf-8-sig"))
-        records = page.records
-    else:
+    try:
         records = json.loads(data)
-        if isinstance(records, dict):
-            records = records.get("dailyPapers", records.get("papers"))
+    except ValueError as exc:
+        raise ValueError(f"Expected JSON from Hugging Face Daily Papers API: {feed_url}") from exc
+    if isinstance(records, dict):
+        records = records.get("dailyPapers", records.get("papers"))
     if not isinstance(records, list):
         raise ValueError(f"Unexpected Hugging Face Daily Papers schema: {feed_url}")
     entries = []
@@ -213,31 +198,20 @@ def source_url_for_date(url: str, date: str | None) -> str:
         return url
     parts = urlsplit(url)
     query = dict(parse_qsl(parts.query))
-    if parts.path.rstrip("/") == "/api/daily_papers":
-        query["date"] = date
-        path = parts.path
-    else:
-        query.pop("date", None)
-        path = f"/papers/date/{date}"
-    return urlunsplit((parts.scheme, parts.netloc, path, urlencode(query), ""))
+    query["date"] = date
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), ""))
 
 
 def source_entries(url: str, date: str | None) -> list[dict[str, str]]:
     request_url = source_url_for_date(url, date)
     data, _, final_url = fetch(request_url, 8 * 1024 * 1024)
     if is_hf_daily(url) or is_hf_daily(final_url):
-        entries = parse_hf_daily(data, request_url)
-        # A dated API and the public edition page can disagree; check the page
-        # rather than interpreting an empty API response as a verified empty edition.
-        if not entries and date and urlsplit(request_url).path.rstrip("/") == "/api/daily_papers":
-            page_url = f"https://huggingface.co/papers/date/{date}"
-            page, _, _ = fetch(page_url, 8 * 1024 * 1024)
-            entries = parse_hf_daily(page, page_url)
-        return entries
+        return parse_hf_daily(data, request_url)
     try:
         return parse_feed(data, final_url)
     except (ET.ParseError, ValueError) as exc:
-        raise ValueError(f"Unsupported or malformed source: {url}. Expected RSS/Atom or a supported Daily Papers URL") from exc
+        raise ValueError(f"Unsupported or malformed source: {url}. Expected RSS/Atom or an explicitly supported API. "
+                         "Ordinary webpages require agent-led handling") from exc
 
 
 class TextExtractor(HTMLParser):
@@ -562,7 +536,7 @@ def main() -> int:
             with db:
                 db.execute("DELETE FROM current_items")
             if not feeds:
-                emit({"new": 0, "errors": [], "note": f"Add RSS or Atom URLs to {root / 'feeds.txt'}"})
+                emit({"new": 0, "errors": [], "note": f"Add RSS/Atom or supported API URLs to {root / 'feeds.txt'}"})
                 return 0
             count, downloaded, reused, old, undated, future, errors = 0, 0, 0, 0, 0, 0, []
             cache = cache_index(root)

@@ -1,5 +1,4 @@
 import contextlib
-import html
 from datetime import datetime, timedelta, timezone
 from email.utils import format_datetime
 import importlib.util
@@ -176,59 +175,81 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(archive.source_url_for_date(source, "2026-09-25"),
                          source + "&date=2026-09-25")
 
-    def test_hf_daily_pages_and_json_wrappers_preserve_metadata(self):
+    def test_hf_daily_json_preserves_metadata(self):
+        source = "https://huggingface.co/api/daily_papers?limit=100"
         records = [{"publishedAt": "2026-09-25T00:00:00Z", "paper": {
             "id": "2609.28654", "title": 'A "quoted" title & evidence',
             "publishedAt": "2026-09-23T00:00:00Z", "summary": "Author abstract"}}]
-        expected = archive.parse_hf_daily(json.dumps(records).encode(), "https://huggingface.co/papers")
-        props = html.escape(json.dumps({"dailyPapers": records}), quote=True)
-        page = f'<html><div data-target="DailyPapers" data-props="{props}"></div></html>'.encode()
-        self.assertEqual(archive.parse_hf_daily(page, "https://huggingface.co/papers"), expected)
+        expected = archive.parse_hf_daily(json.dumps(records).encode(), source)
+        self.assertEqual(expected[0]["title"], records[0]["paper"]["title"])
         self.assertEqual(expected[0]["summary"], "Author abstract")
         for wrapper in ("papers", "dailyPapers"):
-            self.assertEqual(archive.parse_hf_daily(json.dumps({wrapper: records}).encode(), "https://huggingface.co/papers"), expected)
-        for url in ("https://huggingface.co/papers", "https://huggingface.co/papers/",
-                    "https://huggingface.co/papers/date/2026-09-25", "https://huggingface.co/api/daily_papers/"):
-            self.assertTrue(archive.is_hf_daily(url))
-        self.assertFalse(archive.is_hf_daily("https://huggingface.co/papers/2609.28654"))
-        self.assertFalse(archive.is_hf_daily("https://example.org/papers"))
-        self.assertEqual(archive.source_url_for_date("https://huggingface.co/papers?sort=trending", "2026-09-25"),
-                         "https://huggingface.co/papers/date/2026-09-25?sort=trending")
+            self.assertEqual(archive.parse_hf_daily(json.dumps({wrapper: records}).encode(), source), expected)
 
-    def test_empty_dated_api_checks_the_public_edition(self):
+    def test_hf_daily_url_matching_is_api_only(self):
+        for url in ("https://huggingface.co/api/daily_papers?limit=100",
+                    "https://huggingface.co/api/daily_papers/", "https://www.huggingface.co/api/daily_papers"):
+            with self.subTest(url=url):
+                self.assertTrue(archive.is_hf_daily(url))
+        for url in ("https://huggingface.co/papers", "https://huggingface.co/papers/",
+                    "https://huggingface.co/papers/date/2026-09-25",
+                    "https://huggingface.co/papers/2609.28654", "https://example.org/api/daily_papers"):
+            with self.subTest(url=url):
+                self.assertFalse(archive.is_hf_daily(url))
+                self.assertEqual(archive.source_url_for_date(url, "2026-09-25"), url)
+        source = "https://huggingface.co/api/daily_papers?date=2026-09-24&limit=100"
+        self.assertEqual(archive.source_url_for_date(source, "2026-09-25"),
+                         "https://huggingface.co/api/daily_papers?date=2026-09-25&limit=100")
+
+    def test_empty_dated_api_does_not_fall_back_to_a_webpage(self):
         source = "https://huggingface.co/api/daily_papers?limit=100"
-        props = html.escape(json.dumps({"dailyPapers": [{"paper": {
-            "id": "2609.28654", "title": "A", "publishedAt": "2026-09-23T00:00:00Z"}}]}), quote=True)
-        page = f'<div data-target="DailyPapers" data-props="{props}"></div>'.encode()
-        with mock.patch.object(archive, "fetch", side_effect=[(b"[]", "application/json", source),
-                                                             (page, "text/html", "https://huggingface.co/papers/date/2026-09-25")]) as fetch:
-            entries = archive.source_entries(source, "2026-09-25")
-        self.assertEqual(entries[0]["url"], "https://arxiv.org/abs/2609.28654")
-        self.assertEqual(fetch.call_args_list[-1], mock.call("https://huggingface.co/papers/date/2026-09-25", 8 * 1024 * 1024))
+        with mock.patch.object(archive, "fetch", return_value=(b"[]", "application/json", source)) as fetch:
+            self.assertEqual(archive.source_entries(source, "2026-09-25"), [])
+        fetch.assert_called_once_with(source + "&date=2026-09-25", 8 * 1024 * 1024)
+
+    def test_api_html_response_is_an_error_without_fallback(self):
+        source = "https://huggingface.co/api/daily_papers"
+        with mock.patch.object(archive, "fetch", return_value=(b"<html>Unavailable</html>", "text/html", source)) as fetch:
+            with self.assertRaisesRegex(ValueError, "Expected JSON"):
+                archive.source_entries(source, None)
+        fetch.assert_called_once_with(source, 8 * 1024 * 1024)
+
+    def test_api_network_error_is_not_replaced_by_scraping(self):
+        source = "https://huggingface.co/api/daily_papers"
+        with mock.patch.object(archive, "fetch", side_effect=OSError("offline")) as fetch:
+            with self.assertRaisesRegex(OSError, "offline"):
+                archive.source_entries(source, None)
+        fetch.assert_called_once_with(source, 8 * 1024 * 1024)
 
     def test_source_schema_changes_are_errors_not_empty_feeds(self):
         for data in (b"{}", b"[null]", b'[{"paper": {"id": "not-an-id"}}]', b"<html>Changed layout</html>"):
             with self.subTest(data=data), self.assertRaises(ValueError):
-                archive.parse_hf_daily(data, "https://huggingface.co/papers")
-        with mock.patch.object(archive, "fetch", return_value=(b"<html>Blog index</html>", "text/html", "https://example.org/index")):
-            with self.assertRaisesRegex(ValueError, "Unsupported or malformed source"):
-                archive.source_entries("https://example.org/index", None)
+                archive.parse_hf_daily(data, "https://huggingface.co/api/daily_papers")
 
-    def test_sync_handles_mixed_rss_and_hf_page_sources(self):
+    def test_webpages_and_unadapted_json_apis_require_agent_handling(self):
+        for source, data, media_type in (
+            ("https://example.org/index", b"<html>Blog index</html>", "text/html"),
+            ("https://huggingface.co/papers", b'<div data-target="DailyPapers" data-props=\'{"dailyPapers": []}\'></div>', "text/html"),
+            ("https://example.org/api/articles", b'[{"url": "https://example.org/article"}]', "application/json"),
+        ):
+            with self.subTest(source=source), mock.patch.object(archive, "fetch", return_value=(data, media_type, source)) as fetch:
+                with self.assertRaisesRegex(ValueError, "Ordinary webpages require agent-led handling"):
+                    archive.source_entries(source, None)
+                fetch.assert_called_once_with(source, 8 * 1024 * 1024)
+
+    def test_sync_handles_mixed_rss_and_hf_api_sources(self):
         rss_url = "https://example.org/feed"
-        hf_url = "https://huggingface.co/papers"
+        hf_url = "https://huggingface.co/api/daily_papers?limit=100"
         published = datetime.now(timezone.utc).isoformat()
         rss = f'<rss><channel><item><title>Blog</title><link>https://example.org/blog</link><pubDate>{published}</pubDate></item></channel></rss>'.encode()
-        props = html.escape(json.dumps({"dailyPapers": [{"paper": {
-            "id": "2609.28654", "title": "Paper", "publishedAt": published}}]}), quote=True)
-        hf = f'<div data-target="DailyPapers" data-props="{props}"></div>'.encode()
+        hf = json.dumps([{"paper": {"id": "2609.28654", "title": "Paper", "publishedAt": published}}]).encode()
         (self.root / "feeds.txt").write_text(rss_url + "\n" + hf_url + "\n", encoding="utf-8")
 
         def fetch(url, limit):
             if url == rss_url:
                 return rss, "application/rss+xml", url
             if url == hf_url:
-                return hf, "text/html", url
+                return hf, "application/json", url
             if "/pdf/" in url:
                 return b"%PDF-1.7\noriginal", "application/pdf", url
             return b"<html><body>Original</body></html>", "text/html", url
@@ -237,6 +258,29 @@ class ArchiveTests(unittest.TestCase):
             with mock.patch.object(sys, "argv", ["archive.py", "--root", str(self.root), "sync"]):
                 self.assertEqual(archive.main(), 0)
         self.assertEqual(self.db.execute("SELECT count(*) FROM current_items").fetchone()[0], 2)
+
+    def test_sync_reports_webpage_gap_and_keeps_valid_feed_items(self):
+        page_url = "https://example.org/index"
+        feed_url = "https://example.org/feed"
+        published = format_datetime(datetime.now(timezone.utc))
+        feed = f'<rss><channel><item><title>Article</title><link>https://example.org/article</link><pubDate>{published}</pubDate></item></channel></rss>'.encode()
+        (self.root / "feeds.txt").write_text(page_url + "\n" + feed_url + "\n", encoding="utf-8")
+
+        def fetch(url, limit):
+            if url == feed_url:
+                return feed, "application/rss+xml", url
+            return b"<html><body>Original</body></html>", "text/html", url
+
+        output = io.StringIO()
+        with mock.patch.object(archive, "fetch", side_effect=fetch), contextlib.redirect_stdout(output):
+            with mock.patch.object(sys, "argv", ["archive.py", "--root", str(self.root), "sync"]):
+                self.assertEqual(archive.main(), 1)
+        result = json.loads(output.getvalue().splitlines()[-1])
+        self.assertEqual(result["new"], 1)
+        self.assertEqual(len(result["errors"]), 1)
+        self.assertIn(page_url, result["errors"][0])
+        self.assertIn("agent-led handling", result["errors"][0])
+        self.assertEqual(self.db.execute("SELECT count(*) FROM current_items").fetchone()[0], 1)
 
     def test_issue_check_accepts_20_articles_and_rejects_21(self):
         items = self.articles(21)
