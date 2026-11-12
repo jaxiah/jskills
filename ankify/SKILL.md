@@ -13,7 +13,7 @@ Use Wozniak's [20 Rules of Knowledge Formulation](references/20-rules.md) and Ni
 
 1. **One recall target per card.** Before drafting, identify the single fact, distinction, or missing link the card tests. If the target cannot be stated in one sentence, narrow the prompt or split the card. For source lists, reduce each point to its smallest useful recall target.
 
-2. **Unambiguous prompt.** The front must stand on its own during review and specify what is being asked clearly enough to have exactly one intended answer. Do not make the learner guess the scope or level of detail.
+2. **Independent recall and unambiguous prompts.** Assume the learner encounters this card alone months later, without the conversation, source note, neighboring cards, or their original order. Include the minimum context needed to identify the situation and intended question. Do not silently treat conversation-specific facts, examples, or definitions as known prerequisites. In the back, introduce any additional symbols, referents, or assumptions before using them. Before presenting a card, read it in isolation and check that both the question and the explanation remain understandable. Ordinary subject prerequisites need not be retaught.
 
 3. **Shortest sufficient answer.** For Basic cards, the back should fully satisfy the prompt, preferably in 1-2 sentences. For Cloze cards, the deleted text is the recalled answer; any answer-side supplement should clarify it rather than add an unrelated target. Do not add recaps, tradeoffs, adjacent background, or "why this matters" unless the prompt asks for them. Use mnemonics when they directly support recall, not as unrelated answer padding.
 
